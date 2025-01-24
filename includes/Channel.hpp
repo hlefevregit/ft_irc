@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:41:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/23 17:41:40 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/24 14:29:05 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,19 +29,6 @@ private:
 public:
 	Channel(const std::string &name);
 	~Channel();
-
-	const std::string &getName() const;
-
-	void addUser(Client *client);
-	void removeUser(int fd);
-	
-	void addOperator(int fd);
-	void removeOperator(int fd);
-
-	bool isOperator(int fd) const;
-	bool hasUser(int fd) const;
-	
-	void broadcast(const std::string &message, int senderFd = -1);
 };
 
 #endif

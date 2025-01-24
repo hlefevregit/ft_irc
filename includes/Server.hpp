@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/23 17:32:59 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/24 17:43:09 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,24 @@
 #include <stdexcept>
 #include <sstream>
 #include <algorithm>
+#include <iostream>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <cstring>
+#include <iomanip>
+#include <ctime>
+#include <netdb.h>
+#include <csignal>
 
 #include "Client.hpp"
 #include "Channel.hpp"
+
+#define NICKNAME 0
+#define USERNAME 1
+
+#define MAX_CLIENT 15
+
+extern bool serverRunning;
 
 class Client;
 
@@ -48,33 +63,35 @@ class Server
 private:	
 	int						_serverSocket;
 	std::vector<pollfd> 	_pollfds;
-	std::map<int, Client*>	_clients;
+	std::map<const int, Client>	_clients;
 	std::string				_password;
 	std::map<int, clientState> _clientStates;
+	std::string		_datetime;
 
-	std::map<std::string, Channel*>	_channels;
+	// std::map<std::string, Channel*>	_channels;
 
-	void _acceptNewClient(int clientSocket);
-	bool _readFromClient(int fd);
-	void _removeClient(int fd);
-	void authenticateClient(int fd, const std::string &message);
 
 public:
-	Server(int port, const std::string &password);
+	Server(int port, const std::string &password, struct tm *timeinfo);
 	~Server();
 
 	void run();
 	void shutDownServer();
+	void setDatetime(struct tm *timeinfo);
 
-	void createChannel(const std::string &name);
-	void deleteChannel(const std::string &name);
-	Channel *getChannel(const std::string &name);
-	Client *getClient(int fd);
+	// Channel *getChannel(const std::string &name);
+	std::map<const int, Client> &getClients();
 
-	void	joinChannel(int fd, const std::string &name);
-	void	leaveChannel(int fd, const std::string &name);
+	int	acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds);
+	int	readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it);
 
-	void	displayChannels();
+	void	addClient(int clientSocket, std::vector<pollfd> &pollfds);
+	void	deleteClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it, int fd);
+
+	// void	joinChannel(int fd, const std::string &name);
+	// void	leaveChannel(int fd, const std::string &name);
+
+	// void	displayChannels();
 	// void addUserToChannel(int fd, const std::string &name);
 	// void removeUserFromChannel(int fd, const std::string &name);
 	// void sendMessageToChannel(const std::string &name, const std::string &message);

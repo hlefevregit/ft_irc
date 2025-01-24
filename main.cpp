@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 14:01:19 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/23 16:12:46 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/24 17:40:40 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,14 @@
 #include <cstring>
 #include <cstdlib>
 #include "./includes/Server.hpp"
+
+bool serverRunning = true;
+
+static void	signal_handler(int signal)
+{
+	(void)signal;
+    serverRunning = false;
+}
 
 int main(int ac, char **av)
 {
@@ -35,7 +43,14 @@ int main(int ac, char **av)
     }
     
     try {
-        Server server(port, password);
+        time_t rawtime;
+		struct tm * timeinfo;
+
+		time (&rawtime);
+		timeinfo = localtime(&rawtime);
+        
+        signal(SIGINT, signal_handler);
+        Server server(port, password, timeinfo);
         server.run();
     } catch (const std::exception &e) {
         std::cerr << "\033[1;31mError: " << e.what() << "\033[0m" << std::endl;
