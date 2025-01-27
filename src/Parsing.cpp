@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/01/27 12:22:27 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/27 15:50:55 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ int    Server::parseMessage(Client *client, std::string const &message)
     std::vector<std::string> cmds;
     std::map<const int, Client>::iterator it = _clients.find(client->getFd());
     
+    std::cout << YELLOW << "[DEBUG]" << RESET << " Parsing message" << std::endl;
     splitMessage(cmds, message);
     
     for (size_t i = 0; i != cmds.size(); i++)
@@ -43,8 +44,11 @@ int    Server::parseMessage(Client *client, std::string const &message)
         }
         else
         {
-            // std::cout << "\033[32m[INFO]\033[0m Message: " << cmds[i] << std::endl;
-            //execCommand(client, cmds[i]);
+            if (!it->second.getReadBuffer().empty()) {
+                // std::cout << "\033[32m[INFO]\033[0m Message: " << cmds[i] << std::endl;
+                //execCommand(client, cmds[i]);
+
+            }
             client->resetBuffer();
         }
     }

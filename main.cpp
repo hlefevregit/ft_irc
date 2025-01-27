@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 14:01:19 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/27 15:25:14 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/27 16:07:57 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ int main(int ac, char **av)
     }
     int port = std::atoi(av[1]);
     std::string password = av[2];
-    // std::cout << "Password = " << password << std::endl;
     
     if (port <= 0 || port > 65535) {
         std::cerr << "\033[1;31mInvalid port number\033[0m" << std::endl;
@@ -66,8 +65,8 @@ int main(int ac, char **av)
 		time (&rawtime);
 		timeinfo = localtime(&rawtime);
         
-        signal(SIGINT, signal_handler);
         Server server(port, password, timeinfo);
+        signal(SIGINT, signal_handler);
         server.run();
     } catch (const std::exception &e) {
         std::cerr << "\033[1;31mError: " << e.what() << "\033[0m" << std::endl;

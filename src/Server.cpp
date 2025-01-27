@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/27 15:21:34 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/27 16:07:42 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,10 @@ int Server::acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &n
 	socklen_t clientAddrLen = sizeof(clientAddr);
 	int clientSocket = accept(_serverSocket, (struct sockaddr*)&clientAddr, &clientAddrLen);
 	if (clientSocket < 0) {
+		if (errno == EINTR) {
+			std::cout << GREEN << "[INFO]" << RESET << " Signal received" << std::endl;
+			return 1;
+		}
 		std::cerr << "\033[31m[ERROR]\033[0m Failed to accept client" << std::endl;
 		return 2;
 	}
@@ -163,7 +167,6 @@ int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 	
 	char buffer[4096];
 	std::memset(buffer, 0, sizeof(buffer));
-
 	int bytesRead = recv(it->fd, buffer, sizeof(buffer), 0);
 
 	if (bytesRead < 0) {
@@ -178,9 +181,11 @@ int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 
 		std::cout << "\033[32m[INFO]\033[0m Received " << bytesRead << " bytes from client" << std::endl;
 		client->setReadBuffer(buffer);
-
-		while (!client->getReadBuffer().empty() && (client->getReadBuffer().back() == '\n' || client->getReadBuffer().back() == '\r')) 
-			client->setReadBuffer(client->getReadBuffer().substr(0, client->getReadBuffer().size() - 1));
+		if (bytesRead == 1)
+			client->setReadBuffer("");
+		else
+			while (!client->getReadBuffer().empty() && (client->getReadBuffer().back() == '\n' || client->getReadBuffer().back() == '\r')) 
+				client->setReadBuffer(client->getReadBuffer().substr(0, client->getReadBuffer().size() - 1));
 		std::cout << "\033[32m[INFO]\033[0m Message: " << buffer << std::endl;
 		try {
 			this->parseMessage(client, client->getReadBuffer());
@@ -190,6 +195,7 @@ int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 			std::cerr << "\033[31m[ERROR]\033[0m " << e.what() << std::endl;
 			return 3;
 		}
+		std::cout << YELLOW << "[DEBUG]" << RESET << " Message parsed" << std::endl;
 	}
 		
 	
@@ -198,7 +204,6 @@ int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 
 
 void Server::run() {
-	std::cout << "\033[32m[INFO]\033[0m Server is running" << std::endl;
 	
 	std::vector<pollfd> pollfds;
 	pollfd serverPfd;
@@ -209,7 +214,7 @@ void Server::run() {
 
 
 	while (serverRunning == 1) {
-
+		std::cout << RED << "[INFO]" << RESET << " Server running = " << serverRunning << std::endl;
 		std::vector<pollfd> newPollfds;
 		
 		if (poll((pollfd *)&pollfds[0], (unsigned int)pollfds.size(), -1) < 0) {
