@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/24 17:43:09 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/27 15:21:16 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,18 @@
 #include <ctime>
 #include <netdb.h>
 #include <csignal>
+#include <atomic>
 
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "Colors.hpp"
 
 #define NICKNAME 0
 #define USERNAME 1
 
 #define MAX_CLIENT 15
 
-extern bool serverRunning;
+extern volatile sig_atomic_t serverRunning;
 
 class Client;
 
@@ -75,26 +77,22 @@ public:
 	Server(int port, const std::string &password, struct tm *timeinfo);
 	~Server();
 
-	void run();
-	void shutDownServer();
-	void setDatetime(struct tm *timeinfo);
+	void 	run();
+	void 	shutDownServer();
+	void 	setDatetime(struct tm *timeinfo);
 
-	// Channel *getChannel(const std::string &name);
-	std::map<const int, Client> &getClients();
+	std::map<const int, Client>	&getClients();
 
-	int	acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds);
-	int	readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it);
+	int		acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds);
+	int		readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it);
 
 	void	addClient(int clientSocket, std::vector<pollfd> &pollfds);
 	void	deleteClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it, int fd);
 
-	// void	joinChannel(int fd, const std::string &name);
-	// void	leaveChannel(int fd, const std::string &name);
-
-	// void	displayChannels();
-	// void addUserToChannel(int fd, const std::string &name);
-	// void removeUserFromChannel(int fd, const std::string &name);
-	// void sendMessageToChannel(const std::string &name, const std::string &message);
+	int		parseMessage(Client *client, const std::string &message);
+	
 };
+
+std::string messageCleaner(char *buffer);
 
 #endif

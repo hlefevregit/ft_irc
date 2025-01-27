@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/24 18:58:05 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/27 15:21:34 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ Server::Server(int port, const std::string &password, struct tm *timeinfo) : _pa
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_addr.s_addr = INADDR_ANY;
 	serverAddr.sin_port = htons(port);
-
+	int opt = 1;
+	setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	if (bind(_serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
 		throw std::runtime_error("Error: Failed to bind socket");
 	if (listen(_serverSocket, MAX_CLIENT) < 0)
@@ -70,6 +71,7 @@ void Server::shutDownServer() {
 	for (std::vector<pollfd>::iterator it = _pollfds.begin(); it != _pollfds.end(); ++it) {
 		close(it->fd);
 	}
+	shutdown(_serverSocket, SHUT_RDWR);
 	close(_serverSocket);
 	std::cout << "Server shut down" << std::endl;
 }
@@ -78,14 +80,37 @@ void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds) {
 	pollfd pfd;
 	pfd.fd = clientSocket;
 	pfd.events = POLLIN;
-	pollfds.push_back(pfd);
 	Client newClient(clientSocket);
 	
 	_clients.insert(std::pair<int, Client>(clientSocket, newClient));
 	std::cout << "\033[32m[INFO]\033[0m New client added #" << clientSocket << std::endl;
 
-	std::string msg = "Welcome to the server, please press [ENTER] to continue\n";
+	std::string msg = "Welcome to the server, please enter the password: ";
 	send(clientSocket, msg.c_str(), msg.size(), 0);
+	char buffer[1024];
+	std::memset(buffer, 0, sizeof(buffer));
+	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+	if (bytesRead < 0) {
+		std::cerr << "\033[31m[ERROR]\033[0m Failed to read from client" << std::endl;
+	} else if (bytesRead == 0) {
+		std::cout << "\033[32m[INFO]\033[0m Client disconnected" << std::endl;
+	} else {
+		std::string password(buffer);
+		std::string cleanPassword(password);
+		while (!cleanPassword.empty() && (cleanPassword.back() == '\n' || cleanPassword.back() == '\r')) 
+        	cleanPassword.pop_back();
+		if (cleanPassword != _password) {
+			std::string msg = "Wrong password\n";
+			send(clientSocket, msg.c_str(), msg.size(), 0);
+			std::cout << "\033[32m[INFO]\033[0m Wrong password, client disconnected" << std::endl;
+			close(clientSocket);
+		} else {
+			std::string msg = "Password accepted\n";
+			send(clientSocket, msg.c_str(), msg.size(), 0);
+			pollfds.push_back(pfd);
+			// _pollfds.push_back(pfd);
+		}
+	}
 }
 
 void Server::deleteClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it, int fd) {
@@ -93,7 +118,6 @@ void Server::deleteClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::ite
 	close(fd);
 	_clients.erase(fd);
 	pollfds.erase(it);
-
 	std::cout << "\033[32m[INFO]\033[0m Total client: " << _clients.size() << std::endl;
 }
 
@@ -113,8 +137,8 @@ int Server::acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &n
 		close(clientSocket);
 	} else {
 		addClient(clientSocket, newPollfds);
+		std::cout << "\033[32m[INFO]\033[0m New client connected" << std::endl;
 	}
-	std::cout << "\033[32m[INFO]\033[0m New client connected" << std::endl;
 	return 0;
 	
 }
@@ -153,30 +177,18 @@ int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 	} else {
 
 		std::cout << "\033[32m[INFO]\033[0m Received " << bytesRead << " bytes from client" << std::endl;
-		std::cout << "\033[32m[INFO]\033[0m Message: " << buffer << std::endl;
 		client->setReadBuffer(buffer);
 
-		if  (client->getReadBuffer().find("\r\n") != std::string::npos) {
-			
-			try {
-				if (!client->isAuthenticated())
-				{
-					client->authentification(client);
-				}
-				else
-				{
-					std::string msg = "You are authenticated\n";
-					send(client->getSocket(), msg.c_str(), msg.size(), 0);
-					//parse cmd
-				}
-			} catch (const std::exception &e) {
-				std::cerr << "\033[31m[ERROR]\033[0m " << e.what() << std::endl;
-				return 3;
-			}
-		}
-		else {
-			std::string msg = "Please press [ENTER] to continue\n";
-			send(client->getSocket(), msg.c_str(), msg.size(), 0);
+		while (!client->getReadBuffer().empty() && (client->getReadBuffer().back() == '\n' || client->getReadBuffer().back() == '\r')) 
+			client->setReadBuffer(client->getReadBuffer().substr(0, client->getReadBuffer().size() - 1));
+		std::cout << "\033[32m[INFO]\033[0m Message: " << buffer << std::endl;
+		try {
+			this->parseMessage(client, client->getReadBuffer());
+			if (client->getReadBuffer().find("\r\n"))
+				client->resetBuffer();
+		} catch (const std::exception &e) {
+			std::cerr << "\033[31m[ERROR]\033[0m " << e.what() << std::endl;
+			return 3;
 		}
 	}
 		
@@ -196,11 +208,15 @@ void Server::run() {
 	pollfds.push_back(serverPfd);
 
 
-	while (serverRunning == true) {
+	while (serverRunning == 1) {
 
 		std::vector<pollfd> newPollfds;
 		
 		if (poll((pollfd *)&pollfds[0], (unsigned int)pollfds.size(), -1) < 0) {
+			if (errno == EINTR) {
+				std::cout << GREEN << "[INFO]" << RESET << " Signal received" << std::endl;
+				continue ;
+			}
 			std::cerr << "\033[31m[ERROR]\033[0m Failed to poll" << std::endl;
 			break;
 		}

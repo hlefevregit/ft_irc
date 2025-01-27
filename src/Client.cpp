@@ -6,7 +6,7 @@
 /*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/24 18:33:17 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/27 13:42:16 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,19 @@ Client::Client(int socket) : _socket(socket), _authentificated(false), _hasUsern
 
 Client::Client(const Client &src) {
 	*this = src;
+}
+
+Client &Client::operator=(const Client &src) {
+	if (this != &src) {
+		_socket = src._socket;
+		_authentificated = src._authentificated;
+		_hasUsername = src._hasUsername;
+		_hasNickname = src._hasNickname;
+		_nickname = src._nickname;
+		_username = src._username;
+		_readBuf = src._readBuf;
+	}
+	return *this;
 }
 
 Client::~Client() {}
@@ -36,49 +49,78 @@ void Client::setReadBuffer(std::string const &buf) {
 	_readBuf += buf;
 }
 
+std::string messageCleaner(char *buffer)
+{
+	std::string message(buffer);
+	std::string cleanMessage(message);
+	while (!cleanMessage.empty() && (cleanMessage.back() == '\n' || cleanMessage.back() == '\r')) 
+		cleanMessage.pop_back();
+	return cleanMessage;
+}
+
 int Client::authentification(Client *client) {
-	char buffer[1024];
-	memset(buffer, 0, sizeof(buffer));
-	
-	if (!hasUsername())
-	{
-		std::string alt = "Authentification ...\n";
-		send(client->getSocket(), alt.c_str(), alt.size(), 0);
-		std::string msg = "Enter your username: ";
+	if (!_hasNickname) {
+		std::string msg = "Please enter a nickname: ";
 		send(client->getSocket(), msg.c_str(), msg.size(), 0);
+		char buffer[4096];
+		std::memset(buffer, 0, sizeof(buffer));
 		int bytesRead = recv(client->getSocket(), buffer, sizeof(buffer), 0);
 		if (bytesRead < 0) {
 			std::cerr << "\033[31m[ERROR]\033[0m Failed to read from client" << std::endl;
-			return 3;
+			return 0;
 		} else if (bytesRead == 0) {
 			std::cout << "\033[32m[INFO]\033[0m Client disconnected" << std::endl;
-			return 3;
+			return 0;
 		} else {
-			client->setUsername(buffer);
-			std::cout << "Username: " << client->getUsername() << std::endl;
+			std::string nickname = messageCleaner(buffer);
+			if (nickname.length() > 9) {
+				std::string msg = "Nickname too long, please enter a nickname that is less than 9 characters long: ";
+				send(client->getSocket(), msg.c_str(), msg.size(), 0);
+				this->authentification(client);
+			}
+			client->setNickname(nickname);
 		}
 	}
-	else if (!hasNickname())
-	{
-		std::string msg = "Enter your nickname: ";
+	if (!_hasUsername) {
+		std::string msg = "Please enter a username: ";
 		send(client->getSocket(), msg.c_str(), msg.size(), 0);
+		char buffer[4096];
+		std::memset(buffer, 0, sizeof(buffer));
 		int bytesRead = recv(client->getSocket(), buffer, sizeof(buffer), 0);
 		if (bytesRead < 0) {
 			std::cerr << "\033[31m[ERROR]\033[0m Failed to read from client" << std::endl;
-			return 3;
+			return 0;
 		} else if (bytesRead == 0) {
 			std::cout << "\033[32m[INFO]\033[0m Client disconnected" << std::endl;
-			return 3;
+			return 0;
 		} else {
-			client->setNickname(buffer);
-			std::cout << "Nickname: " << client->getNickname() << std::endl;
+			std::string username = messageCleaner(buffer);
+			client->setUsername(username);
 		}
 	}
-	std::cout << "_hasUsername: " << client->hasUsername() << std::endl;
-	std::cout << "_hasNickname: " << client->hasNickname() << std::endl;
-	if (client->hasUsername() == true && client->hasNickname() == true)
+	if (!_hasPassword)
 	{
-		client->authenticate();
+		std::string msg = "Please enter a password: ";
+		send(client->getSocket(), msg.c_str(), msg.size(), 0);
+		char buffer[4096];
+		std::memset(buffer, 0, sizeof(buffer));
+		int bytesRead = recv(client->getSocket(), buffer, sizeof(buffer), 0);
+		if (bytesRead < 0) {
+			std::cerr << "\033[31m[ERROR]\033[0m Failed to read from client" << std::endl;
+			return 0;
+		} else if (bytesRead == 0) {
+			std::cout << "\033[32m[INFO]\033[0m Client disconnected" << std::endl;
+			return 0;
+		} else {
+			std::string password = messageCleaner(buffer);
+			client->setPassword(password);
+		}
+	}
+	if (_hasUsername && _hasNickname && _hasPassword) {
+		authenticate();
+		std::string msg = "Welcome " + _nickname + "!\n";
+		send(client->getSocket(), msg.c_str(), msg.size(), 0);
+		return 1;
 	}
 	return 0;
 }
