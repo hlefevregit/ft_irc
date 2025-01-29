@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/27 13:42:16 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/29 11:53:36 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,8 @@ std::string messageCleaner(char *buffer)
 {
 	std::string message(buffer);
 	std::string cleanMessage(message);
-	while (!cleanMessage.empty() && (cleanMessage.back() == '\n' || cleanMessage.back() == '\r')) 
-		cleanMessage.pop_back();
+	while (!cleanMessage.empty() && (cleanMessage[cleanMessage.size() - 1] == '\n' || cleanMessage[cleanMessage.size() - 1] == '\r'))
+		cleanMessage = cleanMessage.erase(cleanMessage.size() - 1);
 	return cleanMessage;
 }
 

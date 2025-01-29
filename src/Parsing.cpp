@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/01/27 15:50:55 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/29 14:50:22 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,59 @@ int    Server::parseMessage(Client *client, std::string const &message)
         else
         {
             if (!it->second.getReadBuffer().empty()) {
-                // std::cout << "\033[32m[INFO]\033[0m Message: " << cmds[i] << std::endl;
-                //execCommand(client, cmds[i]);
+                std::string msg = it->second.getReadBuffer();
+                it->second.setReadBuffer("");
+                if (msg.find("\r\n") != std::string::npos)
+                    msg.erase(msg.find("\r\n"));
+                if (msg.find("\n") != std::string::npos)
+                    msg.erase(msg.find("\n"));
+                if (msg.find("\r") != std::string::npos)
+                    msg.erase(msg.find("\r"));
+                if (msg.empty())
+                    return 1;
+                
+                std::cout << YELLOW << "[DEBUG]" << RESET << " Message: " << msg << std::endl;
+                
+                t_cmd cmd;
+                int ret = parseCommand(msg, cmd);
+                switch (ret)
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        sendToUserErr421(client->getFd(), cmd.command.c_str());
+                        return 1;
+                    default:
+                        break;
+                    
+                }
+                
+                if (cmd.command == "JOIN")
+                    joinCommand(it->second, cmd.params);
+                else if (msg.find("USER") != std::string::npos)
+                    changeUsername(it->second, cmd.params);
+                else if (msg.find("PASS") != std::string::npos)
+                    changePassword(it->second, cmd.params);
+                else if (msg.find("NICK") != std::string::npos)
+                    changeNickname(it->second, cmd.params);
+                // else if (msg.find("INVITE") != std::string::npos)
+                //     it->second.inviteToChannel(msg);
+                // else if (msg == "LIST")
+                //     it->second.listChannels();
+                // else if (msg.find("KICK") != std::string::npos)
+                //     it->second.kickFromChannel(msg);
+                // else if (msg.find("MODE") != std::string::npos)
+                //     it->second.changeMode(msg);
+                // else if (msg.find("TOPIC") != std::string::npos)
+                //     it->second.changeTopic(msg);
+                // else if (msg.find("PART") != std::string::npos)
+                //     it->second.leaveChannel(msg);
+                // else if (msg.find("PING") != std::string::npos)
+                //     it->second.ping(msg);
+                // else if (msg.find("PRIVMSG") != std::string::npos)
+                //     it->second.sendMessageToUser(msg);
+                // else
+                //     it->second.sendMessageToChannel(msg);
 
             }
             client->resetBuffer();

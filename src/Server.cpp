@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/27 16:07:42 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/29 13:32:32 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <arpa/inet.h>
 #include <algorithm>
 #include <string>
+#include <map>
 
 
 /*********************************************************************/
@@ -95,10 +96,7 @@ void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds) {
 	} else if (bytesRead == 0) {
 		std::cout << "\033[32m[INFO]\033[0m Client disconnected" << std::endl;
 	} else {
-		std::string password(buffer);
-		std::string cleanPassword(password);
-		while (!cleanPassword.empty() && (cleanPassword.back() == '\n' || cleanPassword.back() == '\r')) 
-        	cleanPassword.pop_back();
+		std::string cleanPassword = messageCleaner(buffer);
 		if (cleanPassword != _password) {
 			std::string msg = "Wrong password\n";
 			send(clientSocket, msg.c_str(), msg.size(), 0);
@@ -113,7 +111,7 @@ void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds) {
 	}
 }
 
-void Server::deleteClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it, int fd) {
+void Server::deleteClient(std::vector<pollfd> &pollfds, const std::vector<pollfd>::iterator &it, int fd) {
 	std::cout << "\033[32m[INFO]\033[0m Deconnecting client #" << fd << std::endl;
 	close(fd);
 	_clients.erase(fd);
@@ -183,9 +181,14 @@ int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 		client->setReadBuffer(buffer);
 		if (bytesRead == 1)
 			client->setReadBuffer("");
-		else
-			while (!client->getReadBuffer().empty() && (client->getReadBuffer().back() == '\n' || client->getReadBuffer().back() == '\r')) 
-				client->setReadBuffer(client->getReadBuffer().substr(0, client->getReadBuffer().size() - 1));
+		else {
+			while (!client->getReadBuffer().empty() && 
+				(client->getReadBuffer()[client->getReadBuffer().size() - 1] == '\n' || 
+				client->getReadBuffer()[client->getReadBuffer().size() - 1] == '\r')) 
+			{
+				client->setReadBuffer(client->getReadBuffer().erase(client->getReadBuffer().size() - 1, 1));
+			}
+		}
 		std::cout << "\033[32m[INFO]\033[0m Message: " << buffer << std::endl;
 		try {
 			this->parseMessage(client, client->getReadBuffer());
@@ -254,3 +257,18 @@ void Server::run() {
 /*********************************************************************/
 /*********************************************************************/
 
+
+void Server::addClientToChannel(Client client, const std::string &channelName)
+{
+	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
+	std::string clientNick = client.getNickname();
+	if (it != _channels.end())
+	{
+		it->second.addUserToChannel(client);
+		std::cout << "\033[32m[INFO]\033[0m " << clientNick << " joined channel " << channelName << std::endl;
+		std::string msg = "You have successfully joined channel " + channelName + "\n";
+		send(client.getFd(), msg.c_str(), msg.size(), 0);
+	}
+	
+
+}

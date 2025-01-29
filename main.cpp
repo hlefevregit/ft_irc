@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 14:01:19 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/27 16:07:57 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/29 14:28:18 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,24 +22,10 @@
 
 volatile sig_atomic_t serverRunning = 1;
 
-struct termios orig_termios;
-
-void disable_echo() {
-    struct termios new_termios;
-    tcgetattr(STDIN_FILENO, &orig_termios); 
-    new_termios = orig_termios;
-    new_termios.c_lflag &= ~ECHOCTL;
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &new_termios);
-}
-
-void restore_terminal() {
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
-}
 
 static void	signal_handler(int signal)
 {
 	(void)signal;
-    restore_terminal();
     serverRunning = 0;
 }
 
@@ -61,7 +47,6 @@ int main(int ac, char **av)
         time_t rawtime;
 		struct tm * timeinfo;
 
-        disable_echo();
 		time (&rawtime);
 		timeinfo = localtime(&rawtime);
         

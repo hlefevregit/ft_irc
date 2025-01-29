@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/27 15:21:16 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/01/29 14:38:32 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,14 @@
 #include <ctime>
 #include <netdb.h>
 #include <csignal>
-#include <atomic>
+#include <errno.h>
+#include <sstream>
 
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Colors.hpp"
+#include "Command.hpp"
+#include "numericalReplies.hpp"
 
 #define NICKNAME 0
 #define USERNAME 1
@@ -44,6 +47,7 @@
 extern volatile sig_atomic_t serverRunning;
 
 class Client;
+class Channel;
 
 struct FdMatcher {
 	int fd;
@@ -70,7 +74,7 @@ private:
 	std::map<int, clientState> _clientStates;
 	std::string		_datetime;
 
-	// std::map<std::string, Channel*>	_channels;
+	std::map<std::string, Channel>	_channels;
 
 
 public:
@@ -82,15 +86,22 @@ public:
 	void 	setDatetime(struct tm *timeinfo);
 
 	std::map<const int, Client>	&getClients();
+	std::map<std::string, Channel>	&getChannels();
 
 	int		acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds);
 	int		readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it);
 
 	void	addClient(int clientSocket, std::vector<pollfd> &pollfds);
-	void	deleteClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it, int fd);
+	void	deleteClient(std::vector<pollfd> &pollfds, const std::vector<pollfd>::iterator &it, int fd);
 
 	int		parseMessage(Client *client, const std::string &message);
+
+	void	joinCommand(Client client, std::string &channelName);
+	void	addClientToChannel(Client client, const std::string &channelName);
 	
+	void	changeNickname(Client client, std::string const &nickname);
+	void	changeUsername(Client client, std::string const &username);
+	void	changePassword(Client client, std::string const &password);
 };
 
 std::string messageCleaner(char *buffer);
