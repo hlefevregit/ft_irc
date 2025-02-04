@@ -6,11 +6,12 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 13:32:32 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:55:45 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
+#include "../includes/numericalReplies.hpp"
 #include <iostream>
 #include <cstring>
 #include <unistd.h>
@@ -200,8 +201,6 @@ int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 		}
 		std::cout << YELLOW << "[DEBUG]" << RESET << " Message parsed" << std::endl;
 	}
-		
-	
 	return 0;
 }
 
@@ -262,13 +261,29 @@ void Server::addClientToChannel(Client client, const std::string &channelName)
 {
 	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
 	std::string clientNick = client.getNickname();
+	std::string ClientUser = client.getUsername();
 	if (it != _channels.end())
 	{
 		it->second.addUserToChannel(client);
 		std::cout << "\033[32m[INFO]\033[0m " << clientNick << " joined channel " << channelName << std::endl;
 		std::string msg = "You have successfully joined channel " + channelName + "\n";
 		send(client.getFd(), msg.c_str(), msg.size(), 0);
-	}
-	
 
+		sendToChannel(client, channelName, USERID(clientNick, ClientUser) + " joined the channel\n");
+	}
+}
+
+void Server::sendToChannel(Client client, const std::string channelName, std::string const &message)
+{
+	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
+	if (it != _channels.end())
+	{
+		std::map<int, Client> users = it->second.getUser();
+		std::map<int, Client>::iterator it;
+		for (it = users.begin(); it != users.end(); it++)
+		{
+			if (it->second.getFd() != client.getFd())
+				send(it->second.getFd(), message.c_str(), message.size(), 0);
+		}
+	}
 }

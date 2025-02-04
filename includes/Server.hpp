@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 14:38:32 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/29 16:57:51 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ public:
 	void	deleteClient(std::vector<pollfd> &pollfds, const std::vector<pollfd>::iterator &it, int fd);
 
 	int		parseMessage(Client *client, const std::string &message);
+	int		parseExec(Client *client, const std::string &message, std::map<const int, Client>::iterator it);
 
 	void	joinCommand(Client client, std::string &channelName);
 	void	addClientToChannel(Client client, const std::string &channelName);
@@ -102,6 +103,8 @@ public:
 	void	changeNickname(Client client, std::string const &nickname);
 	void	changeUsername(Client client, std::string const &username);
 	void	changePassword(Client client, std::string const &password);
+
+	void	sendToChannel(Client client, const std::string channelName, std::string const &message);
 };
 
 std::string messageCleaner(char *buffer);

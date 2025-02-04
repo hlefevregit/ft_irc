@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 10:52:09 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 13:37:08 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/29 14:58:22 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,5 @@ void	Server::joinCommand(Client client, std::string &channelName)
 		_channels.insert(std::pair<std::string, Channel>(channel.getName(), channel));
 		std::cout << "\033[32m[INFO]\033[0m Channel " << channelName << " created" << std::endl;
 	}
-	addClientToChannel(client, channelName);
-	
+	addClientToChannel(client, channelName);	
 }

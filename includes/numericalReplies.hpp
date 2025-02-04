@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 14:40:50 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:53:55 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,3 +86,4 @@
 void    sendToUserErr421(int fd, const char *cmd);
 void    sendToUserErr403(int fd, const char *channel);
 
+#define USERID(nickname, username) ":" + nickname + "!" + username + "@localhost"
