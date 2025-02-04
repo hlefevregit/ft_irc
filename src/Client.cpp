@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 11:53:36 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/31 15:48:01 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Client.hpp"
+#include "../includes/Server.hpp"
 
 Client::Client(int socket) : _socket(socket), _authentificated(false), _hasUsername(false), _hasNickname(false), _nickname(""), _username(""), _readBuf("") {}
 
@@ -120,7 +121,30 @@ int Client::authentification(Client *client) {
 		authenticate();
 		std::string msg = "Welcome " + _nickname + "!\n";
 		send(client->getSocket(), msg.c_str(), msg.size(), 0);
+		sendChad(client->getSocket());
 		return 1;
 	}
 	return 0;
+}
+
+#include <fstream>
+
+void sendChad(int clientSocket)
+{
+	std::ifstream file;
+	char		filePath[22] = "./src/chad.config";
+	
+	file.open(filePath);
+	if (!file.is_open())
+	{
+		std::cerr << "\033[31m[ERROR]\033[0m Failed to open file" << std::endl;
+		return ;
+	}
+	std::string line;
+	while (std::getline(file, line))
+	{
+		send(clientSocket, line.c_str(), line.size(), 0);
+		send(clientSocket, "\n", 1, 0);
+	}
+	file.close();
 }

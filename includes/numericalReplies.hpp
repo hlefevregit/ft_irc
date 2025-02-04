@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   numericalReplies.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 14:40:50 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/02/03 16:59:02 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 #define ERR_INVITEONLYCHAN(channel)	"473 " + channel + " :Cannot join channel (+i)\n"
 #define ERR_BANNEDFROMCHAN(channel) "474 " + channel + " :Cannot join channel (+b)\n"
 #define ERR_NOSUCHCHANNEL(channel) "403 " + channel + " :No such channel\n"
+void    sendToUserErr403(int fd, const char *channel);
 #define ERR_TOOMANYCHANNELS(channel) "405 " + channel + " :You have joined too many channels\n"
 #define ERR_TOOMANYTARGETS(target, errorCode, abortMessage) "407 " + target + " :" + errorCode + "Too many recipients. " + abortMessage + "\n"
 #define ERR_UNAVAILRESOURCE(nick, channel) "437 " + nick + " " + channel + " :Nick/channel is temporarily unavailable\n"
@@ -81,8 +82,7 @@
 #define RPL_NOTOPIC(channel) "331 " + channel + " :No topic is set\n"
 
 #define ERR_UNKNOWNCOMMAND(cmd) "421 " + cmd + " :Unknown command\n"
-
-
 void    sendToUserErr421(int fd, const char *cmd);
-void    sendToUserErr403(int fd, const char *channel);
+
+
 

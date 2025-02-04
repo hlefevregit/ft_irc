@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 14:38:32 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/31 15:48:10 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,12 @@ public:
 	void	changeNickname(Client client, std::string const &nickname);
 	void	changeUsername(Client client, std::string const &username);
 	void	changePassword(Client client, std::string const &password);
+
+	void	sendAllUsers(const std::string &msg, const std::string &nickname);
 };
+
+void 	sendChillguy(int clientSocket);
+void 	sendChad(int clientSocket);
 
 std::string messageCleaner(char *buffer);
 

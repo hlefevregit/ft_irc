@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 13:32:32 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/01/31 15:46:45 by hugolefevre      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,27 @@
 #include <algorithm>
 #include <string>
 #include <map>
+#include <fstream>
 
+void	sendChillguy(int clientSocket)
+{
+	std::ifstream file;
+	char		filePath[22] = "./src/chillGuy.config";
+	
+	file.open(filePath);
+	if (!file.is_open())
+	{
+		std::cerr << "\033[31m[ERROR]\033[0m Failed to open file" << std::endl;
+		return ;
+	}
+	std::string line;
+	while (std::getline(file, line))
+	{
+		send(clientSocket, line.c_str(), line.size(), 0);
+		send(clientSocket, "\n", 1, 0);
+	}
+	file.close();
+}
 
 /*********************************************************************/
 /*********************************************************************/
@@ -105,6 +125,7 @@ void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds) {
 		} else {
 			std::string msg = "Password accepted\n";
 			send(clientSocket, msg.c_str(), msg.size(), 0);
+			sendChillguy(clientSocket);
 			pollfds.push_back(pfd);
 			// _pollfds.push_back(pfd);
 		}
@@ -271,4 +292,15 @@ void Server::addClientToChannel(Client client, const std::string &channelName)
 	}
 	
 
+}
+
+void	Server::sendAllUsers(const std::string &msg, const std::string &nickname)
+{
+	std::map<const int, Client>::iterator it = _clients.begin();
+	while (it != _clients.end())
+	{
+		std::string message = nickname + ": " + msg + "\n";
+		send(it->first, message.c_str(), message.size(), 0);
+		it++;
+	}
 }
