@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 11:05:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 13:35:56 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/12 20:11:27 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,3 +41,38 @@ int	parseCommand(std::string const &message, t_cmd &cmd)
 	std::cout << YELLOW << "[DEBUG]" << RESET << " Params: " << cmd.params << std::endl;
     return 0; 
 }
+
+// void    sendMessage(std::string msg)
+// {
+// 	std::string				channel_prefix = "&#+!";
+// 	std::string				first_word;
+// 	std::string::iterator	start = msg.begin();
+// 	std::string::iterator	end = msg.begin();
+
+// 	std::cout << INFO << "IN sendMessage" << std::endl;
+
+// 	// Get first word
+// 	while (*start == ' ' && start != end)
+// 		++start;
+// 	while (start != end)
+// 	{
+// 		if (*start == ' ')
+// 			break;
+// 		first_word += *start;
+// 		++start;
+// 	}
+
+// 	std::cout << DEBUG << "first word : " << first_word << std::endl;
+
+// 	// Checks first word's prefix
+// 	if (first_word.size() > 1)
+// 	{
+// 		if (channel_prefix.find(first_word[0]) != std::string::npos)
+// 			// sendMessageChannel(msg);
+// 		else
+// 			// sendMessageUser(msg);
+// 	}
+
+// 	std::cout << INFO << "OUT sendMessage" << std::endl;
+// 	return ;
+// }

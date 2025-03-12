@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Colors.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 12:18:44 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/01/27 12:19:24 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/03/12 20:11:38 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,5 +18,9 @@
 # define GREEN "\033[0;32m"
 # define BLUE "\033[0;34m"
 # define YELLOW "\033[0;33m"
+
+// # define INFO "\033[0;34m;[INFO]33m\033[0m  "
+// # define DEBUG "\033[0;33m[DEBUG]33m\033[0m "
+// # define ERROR "\033[0;31m[ERROR]33m\033[0m "
 
 #endif
