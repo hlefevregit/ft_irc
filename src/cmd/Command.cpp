@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 11:05:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/12 20:11:27 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/12 20:23:10 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,17 +47,16 @@ int	parseCommand(std::string const &message, t_cmd &cmd)
 // 	std::string				channel_prefix = "&#+!";
 // 	std::string				first_word;
 // 	std::string::iterator	start = msg.begin();
-// 	std::string::iterator	end = msg.begin();
+// 	std::string::iterator	end = msg.end();
 
 // 	std::cout << INFO << "IN sendMessage" << std::endl;
 
-// 	// Get first word
-// 	while (*start == ' ' && start != end)
+// 	// Skip leading spaces
+// 	while (start != end && *start == ' ')
 // 		++start;
-// 	while (start != end)
+// 	// Get first word
+// 	while (start != end && *start != ' ')
 // 	{
-// 		if (*start == ' ')
-// 			break;
 // 		first_word += *start;
 // 		++start;
 // 	}
