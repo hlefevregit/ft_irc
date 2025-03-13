@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 10:43:04 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/12 20:11:32 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:22:52 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 
+class Client;
+
 typedef struct	s_cmd {
 	std::string prefix;
 	std::string command;
@@ -25,7 +27,7 @@ typedef struct	s_cmd {
 
 int		parseCommand(std::string const &message, t_cmd &cmd);
 
-// void	sendMessage(std::string msg);
+// int		sendMessage(Client sender, std::string &params);
 
 
 #endif

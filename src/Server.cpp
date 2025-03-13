@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/31 15:46:45 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/03/13 17:16:01 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,3 +304,37 @@ void	Server::sendAllUsers(const std::string &msg, const std::string &nickname)
 		it++;
 	}
 }
+
+// std::map<const int, Client>::iterator	Server::getClientByNickname(const std::string &nickname)
+// {
+// 	std::map<const int, Client>::iterator	start = _client.begin();
+// 	std::map<const int, Client>::iterator	end = _client.end();
+
+// 	// Check if nickname correspond to a Client's nickname
+// 	while (start != end)
+// 	{
+// 		if (start->second.getNickname() == nickname)
+// 			return (start);
+// 		++start;
+// 	}
+// 	std::cerr << ERROR << "getClientByNickname: nickname not found amongs clients !" << RESET << std::endl;
+// 	return (start);
+// }
+
+// void	Server::sendMessageUser(const std::string &msg, const std::string &nickname)
+// {
+// 	std::map<const int, Client>::iterator	reciever = getClientByNickname(nickname);
+// 	std::map<const int, Client>::iterator	end = _client.end();
+
+// 	if (reciever->first == end->first)
+// 	{
+// 		std::cerr << ERROR << "sendMessageUser: client does not exist !" << RESET << std::endl;
+// 		return ;
+// 	}
+
+// 	// Sends message to user
+// 	std::string message = "PM: " + "Sender" + ": " + msg + "\n";
+// 	send(reciever->first, message.c_str(), message.size(), 0);
+
+// 	return ;
+// }

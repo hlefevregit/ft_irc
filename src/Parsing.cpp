@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/03/12 19:48:00 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:47:19 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,8 +95,10 @@ int    Server::parseMessage(Client *client, std::string const &message)
                 //     it->second.leaveChannel(msg);
                 // else if (msg.find("PING") != std::string::npos)
                 //     it->second.ping(msg);
-                // else if (msg.find("PRIVMSG") != std::string::npos)
-                //     it->second.sendMessage(msg);
+                // if (msg.find("PRIVMSG") != std::string::npos)
+                //     sendMessage(it->second, cmd.params);
+                
+                    // it->second.sendMessage(it->second, cmd.params);
 
             }
             client->resetBuffer();
