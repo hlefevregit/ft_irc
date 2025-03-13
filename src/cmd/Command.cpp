@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 11:05:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/13 17:23:15 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/13 18:04:38 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,10 @@ int	parseCommand(std::string const &message, t_cmd &cmd)
 //     // Check if msg is empty
 //     if (params.empty())
 //     {
+//         std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
+//         send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
 // 		std::cerr << ERROR << "│  sendMessage: messsage is empty !" << RESET << std::endl;
 // 	    std::cout << DEBUG << "└─ OUT sendMessage ───────────────────┘" << std::endl;
-//         // std::cerr << ERROR << ERR_NEEDMOREPARAMS << std::endl;   // TODO : use numerical correctly
 //         return 1;
 //     }
 // 	// Skip leading spaces
