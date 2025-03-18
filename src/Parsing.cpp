@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/03/13 17:47:19 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/18 18:22:04 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ int    Server::parseMessage(Client *client, std::string const &message)
                     
                 // }
                 
+//                sendAllUsers(msg, it->second.getNickname());
                 // if (cmd.command == "JOIN")
                 //     joinCommand(it->second, cmd.params);
                 // else if (msg.find("USER") != std::string::npos)
@@ -80,7 +81,6 @@ int    Server::parseMessage(Client *client, std::string const &message)
                 //     changePassword(it->second, cmd.params);
                 // else if (msg.find("NICK") != std::string::npos)
                 //     changeNickname(it->second, cmd.params);
-                sendAllUsers(msg, it->second.getNickname());
                 // else if (msg.find("INVITE") != std::string::npos)
                 //     it->second.inviteToChannel(msg);
                 // else if (msg == "LIST")
@@ -96,8 +96,12 @@ int    Server::parseMessage(Client *client, std::string const &message)
                 // else if (msg.find("PING") != std::string::npos)
                 //     it->second.ping(msg);
                 // if (msg.find("PRIVMSG") != std::string::npos)
+                // {
                 //     sendMessage(it->second, cmd.params);
-                
+                //     botParse(it->second, cmd.params);
+                // }
+                // else if (msg.find("@joe") != std::string::npos || msg.find("/joe") != std::string::npos)
+                //     botParse(it->second, cmd.params);
                     // it->second.sendMessage(it->second, cmd.params);
 
             }

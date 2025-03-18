@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/31 15:48:10 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/03/18 18:22:48 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,16 @@ public:
 	void	changePassword(Client client, std::string const &password);
 
 	void	sendAllUsers(const std::string &msg, const std::string &nickname);
+
+
+	// ldalmass
+	// std::map<const int, Client>::iterator	getClientByNickname(const std::string &nickname);
+
+	// int		sendMessage(Client sender, std::string &params);
+	// void	sendMessageUser(std::string &msg, const std::string &nickname, Client &sender);
+	
+	// void	botParse(Client sender, std::string &params);
+	// void	botHelp(Client sender);
 };
 
 void 	sendChillguy(int clientSocket);

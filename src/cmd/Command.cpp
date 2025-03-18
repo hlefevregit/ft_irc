@@ -6,12 +6,12 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 11:05:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/13 18:04:38 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/18 15:26:02 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Command.hpp"
-// #include "../../includes/Server.hpp"
+#include "../../includes/Server.hpp"
 
 int	parseCommand(std::string const &message, t_cmd &cmd)
 {
@@ -42,50 +42,3 @@ int	parseCommand(std::string const &message, t_cmd &cmd)
 	std::cout << YELLOW << "[DEBUG]" << RESET << " Params: " << cmd.params << std::endl;
     return 0; 
 }
-
-// int    sendMessage(Client sender, std::string &params)
-// {
-//     (void)sender;
-
-// 	std::string				channel_prefix = "&#+!";
-// 	std::string				first_word;
-// 	std::string::iterator	start = params.begin();
-// 	std::string::iterator	end = params.end();
-
-// 	std::cout << DEBUG << "┌─ IN  sendMessage ───────────────────┐" << std::endl;
-
-//     // Check if msg is empty
-//     if (params.empty())
-//     {
-//         std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-//         send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
-// 		std::cerr << ERROR << "│  sendMessage: messsage is empty !" << RESET << std::endl;
-// 	    std::cout << DEBUG << "└─ OUT sendMessage ───────────────────┘" << std::endl;
-//         return 1;
-//     }
-// 	// Skip leading spaces
-// 	while (start != end && *start == ' ')
-// 		++start;
-// 	// Get first word
-// 	while (start != end && *start != ' ')
-// 	{
-// 		first_word += *start;
-// 		++start;
-// 	}
-
-// 	std::cout << DEBUG << "│  first word : " << first_word << std::endl;
-
-// 	// Checks first word's prefix
-// 	if (first_word.size() > 1)
-// 	{
-// 		if (channel_prefix.find(first_word[0]) != std::string::npos)
-// 			std::cout << DEBUG << "│  is Channel" << RESET << std::endl;
-// 			// sendMessageChannel();    // TODO : dguerin implementation
-// 		else
-// 			std::cout << DEBUG << "│  is User" << RESET << std::endl;
-// 			// sendMessageUser();   // TODO : ldalmass implementation
-// 	}
-
-// 	std::cout << DEBUG << "└─ OUT sendMessage ───────────────────┘" << std::endl;
-// 	return 0;
-// }

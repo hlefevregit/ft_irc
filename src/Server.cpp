@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/13 17:16:01 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/18 18:22:25 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,10 +305,16 @@ void	Server::sendAllUsers(const std::string &msg, const std::string &nickname)
 	}
 }
 
+/*********************************************************************/
+/*********************************************************************/
+/*****************************    PRIVMSG    *************************/
+/*********************************************************************/
+/*********************************************************************/
+
 // std::map<const int, Client>::iterator	Server::getClientByNickname(const std::string &nickname)
 // {
-// 	std::map<const int, Client>::iterator	start = _client.begin();
-// 	std::map<const int, Client>::iterator	end = _client.end();
+// 	std::map<const int, Client>::iterator	start = _clients.begin();
+// 	std::map<const int, Client>::iterator	end = _clients.end();
 
 // 	// Check if nickname correspond to a Client's nickname
 // 	while (start != end)
@@ -317,24 +323,199 @@ void	Server::sendAllUsers(const std::string &msg, const std::string &nickname)
 // 			return (start);
 // 		++start;
 // 	}
+// 	// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
+// 	// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
 // 	std::cerr << ERROR << "getClientByNickname: nickname not found amongs clients !" << RESET << std::endl;
 // 	return (start);
 // }
 
-// void	Server::sendMessageUser(const std::string &msg, const std::string &nickname)
+// void	Server::sendMessageUser(std::string &msg, const std::string &nickname, Client &sender)
 // {
 // 	std::map<const int, Client>::iterator	reciever = getClientByNickname(nickname);
-// 	std::map<const int, Client>::iterator	end = _client.end();
+// 	std::map<const int, Client>::iterator	client_end = _clients.end();
 
-// 	if (reciever->first == end->first)
+// 	/****************/
+// 	/* Basic checks */
+// 	/****************/
+
+// 	// Check if the user is found in the server to send a message to
+// 	if (reciever->first == client_end->first)
 // 	{
+// 		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
+// 		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
 // 		std::cerr << ERROR << "sendMessageUser: client does not exist !" << RESET << std::endl;
 // 		return ;
 // 	}
 
-// 	// Sends message to user
-// 	std::string message = "PM: " + "Sender" + ": " + msg + "\n";
+// 	// Check if the sender is sending a PRIVMSG to itself
+// 	if (sender.getNickname() == reciever->second.getNickname())
+// 	{
+// 		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
+// 		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
+// 		std::cerr << ERROR << "sendMessageUser: cannot send a PRIVMSG to itself !" << RESET << std::endl;
+// 		return ;
+// 	}
+
+// 	/***********************************/
+// 	/* Remove the targeted user in msg */
+// 	/***********************************/
+// 	std::string::iterator	start = msg.begin();
+// 	std::string::iterator	end = msg.end();
+
+// 	// Skips spaces
+// 	while (start != end && *start == ' ')
+// 		++start;
+// 	// Skips first word
+// 	while (start != end && *start != ' ')
+// 		++start;
+// 	// Skips spaces
+// 	while (start != end && *start == ' ')
+// 		++start;
+// 	// Skips the semicolon ':' if needed
+// 	if (start != end && *start == ':')
+// 		++start;
+// 	// Reform message
+// 	std::string	cleaned_message(start, end);
+// 	if (cleaned_message.empty())
+// 	{
+// 		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
+// 		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
+// 		std::cerr << ERROR << "sendMessageUser: cleaned_message is empty !" << RESET << std::endl;
+// 		return ;
+// 	}
+
+// 	/************************/
+// 	/* Send message to user */
+// 	/************************/
+// 	std::string	message = CYAN "Private message from [" + sender.getUsername() + "]: " + RESET + cleaned_message + "\n";
 // 	send(reciever->first, message.c_str(), message.size(), 0);
 
+// 	return ;
+// }
+
+// int    Server::sendMessage(Client sender, std::string &params)
+// {
+// 	std::string				channel_prefix = "&#+!";
+// 	std::string				first_word;
+// 	std::string::iterator	start = params.begin();
+// 	std::string::iterator	end = params.end();
+
+// 	std::cout << DEBUG << "┌─ IN  sendMessage ───────────────────┐" << std::endl;
+
+// 	// Check if msg is empty
+// 	if (params.empty())
+// 	{
+// 		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
+// 		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
+// 		std::cerr << ERROR << "│  sendMessage: messsage is empty !   │" << RESET << std::endl;
+// 		std::cout << DEBUG << "└─ OUT sendMessage ───────────────────┘" << std::endl;
+// 		return 1;
+// 	}
+// 	// Skip leading spaces
+// 	while (start != end && *start == ' ')
+// 		++start;
+// 	// Get first word
+// 	while (start != end && *start != ' ')
+// 	{
+// 		first_word += *start;
+// 		++start;
+// 	}
+
+// 	std::cout << DEBUG << "│  first word : " << first_word << std::endl;
+
+// 	// Checks first word's prefix
+// 	if (first_word.size() > 1)
+// 	{
+// 		if (channel_prefix.find(first_word[0]) != std::string::npos)
+// 			std::cout << DEBUG << "│  is Channel" << RESET << std::endl;
+// 			// sendMessageChannel();    // TODO : dguerin implementation
+// 		else
+// 		{
+// 			std::cout << DEBUG << "│  is User" << RESET << std::endl;
+// 			sendMessageUser(params, first_word, sender);   // TODO : ldalmass implementation
+// 		}
+// 	}
+
+// 	std::cout << DEBUG << "└─ OUT sendMessage ───────────────────┘" << std::endl;
+// 	return 0;
+// }
+
+/*********************************************************************/
+/*********************************************************************/
+/*****************************      BOT      *************************/
+/*********************************************************************/
+/*********************************************************************/
+
+// void	Server::botHelp(Client sender)
+// {
+// 	std::string	message = GREEN "Hey " + sender.getUsername() + " I'm joe !\n"
+// 	RESET "How to use :\n"
+// 	"PRIVMSG joe stats" + YELLOW + " - Display various server statistics.\n" + RESET +
+// 	"PRIVMSG joe user [nickname]" + YELLOW + " - Display informations about an user.\n" + RESET +
+// 	"PRIVMSG joe channel [channel's name]" + YELLOW + " - Display informations about a channel.\n" + RESET
+// 	;
+// 	send(sender.getFd(), message.c_str(), message.size(), 0);
+// 	return ;
+// }
+
+// void	Server::botParse(Client sender, std::string &params)
+// {
+// 	(void) sender;
+
+// 	std::string				word;
+// 	std::string::iterator	start = params.begin();
+// 	std::string::iterator	end = params.end();
+
+// 	std::cout << DEBUG << "┌─ IN  botParse ──────────────────────┐" << std::endl;
+
+// 	// Check if msg is empty
+// 	if (params.empty())
+// 	{
+// 		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
+// 		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
+// 		std::cerr << ERROR << "│  botParse: messsage is empty !      │" << RESET << std::endl;
+// 		std::cout << DEBUG << "└─ OUT botParse ──────────────────────┘" << std::endl;
+// 		return ;
+// 	}
+// 	// Skip leading spaces
+// 	while (start != end && *start == ' ')
+// 		++start;
+// 	// Skip first word spaces
+// 	while (start != end && *start != ' ')
+// 		++start;
+// 	// Skip spaces
+// 	while (start != end && *start == ' ')
+// 		++start;
+// 	// Get second word
+// 	while (start != end && *start != ' ')
+// 	{
+// 		word += *start;
+// 		++start;
+// 	}
+
+// 	std::cout << DEBUG << "│  magic word : " << word << std::endl;
+
+// 	// Check if command
+// 	if (!word.empty())
+// 	{
+// 		if (word == "stats")
+// 		{
+// 			std::cout << DEBUG << "│  is stats command" << RESET << std::endl;
+// 		}
+// 		else if (word == "user")
+// 		{
+// 			std::cout << DEBUG << "│  is user command" << RESET << std::endl;
+// 		}
+// 		else if (word == "channel")
+// 		{
+// 			std::cout << DEBUG << "│  is channel command" << RESET << std::endl;
+// 		}
+// 		else
+// 			botHelp(sender);
+// 	}
+// 	else
+// 		botHelp(sender);
+
+// 	std::cout << DEBUG << "└─ OUT sendMessage ───────────────────┘" << std::endl;	
 // 	return ;
 // }

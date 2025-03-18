@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 10:43:04 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/13 17:22:52 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/18 16:34:58 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,5 @@ typedef struct	s_cmd {
 } 				t_cmd;
 
 int		parseCommand(std::string const &message, t_cmd &cmd);
-
-// int		sendMessage(Client sender, std::string &params);
-
 
 #endif
