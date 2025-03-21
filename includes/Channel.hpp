@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:41:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 13:28:41 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/21 19:47:18 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class Client;
 class Channel {
 private:
 	std::string _name;
+	// std::string _topic;
 	std::map<int, Client > _user;
 	std::vector<int> _operator;
 public:
@@ -35,6 +36,7 @@ public:
 	const std::vector<int> &getOperator() const { return _operator; };
 
 	void addUserToChannel(Client &client);
+	// void invinteUserToChannel(Client &client);
 };
 
 #endif

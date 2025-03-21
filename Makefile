@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+         #
+#    By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/23 13:36:33 by hulefevr          #+#    #+#              #
-#    Updated: 2025/01/29 14:50:45 by hulefevr         ###   ########.fr        #
+#    Updated: 2025/03/21 17:00:44 by ldalmass         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,6 +23,7 @@ SRC		=	main.cpp \
 			./src/numericalReplies.cpp \
 			./src/cmd/joinChannel.cpp \
 			./src/cmd/changeID.cpp \
+			./src/Grid.cpp \
 
 NAME	=	ircserv
 

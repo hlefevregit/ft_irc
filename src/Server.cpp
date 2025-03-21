@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/18 18:22:25 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/21 19:47:44 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -460,8 +460,6 @@ void	Server::sendAllUsers(const std::string &msg, const std::string &nickname)
 
 // void	Server::botParse(Client sender, std::string &params)
 // {
-// 	(void) sender;
-
 // 	std::string				word;
 // 	std::string::iterator	start = params.begin();
 // 	std::string::iterator	end = params.end();
@@ -511,11 +509,14 @@ void	Server::sendAllUsers(const std::string &msg, const std::string &nickname)
 // 			std::cout << DEBUG << "│  is channel command" << RESET << std::endl;
 // 		}
 // 		else
-// 			botHelp(sender);
+// 		{
+// 			std::cout << DEBUG << "└─ OUT botParse ──────────────────────┘" << std::endl;
+// 			return ;
+// 		}
 // 	}
 // 	else
 // 		botHelp(sender);
 
-// 	std::cout << DEBUG << "└─ OUT sendMessage ───────────────────┘" << std::endl;	
+// 	std::cout << DEBUG << "└─ OUT botParse ──────────────────────┘" << std::endl;
 // 	return ;
 // }
