@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/26 19:20:22 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/26 22:34:01 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,42 +279,39 @@ int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 	std::memset(buffer, 0, sizeof(buffer));
 	int bytesRead = recv(it->fd, buffer, sizeof(buffer), 0);
 
-	if (bytesRead < 0) {
+	if (bytesRead < 0)
+	{
 		std::cerr << "\033[31m[ERROR]\033[0m Failed to read from client" << std::endl;
 		deleteClient(pollfds, it, it->fd);
 		return 3;
-	} else if (bytesRead == 0) {
+	}
+	else if (bytesRead == 0)
+	{
 		std::cout << "\033[32m[INFO]\033[0m Client disconnected" << std::endl;
 		deleteClient(pollfds, it, it->fd);
 		return 3;
-	} else {
+	}
+	else
+	{
 
 		std::cout << "\033[32m[INFO]\033[0m Received " << bytesRead << " bytes from client" << std::endl;
 		client->setReadBuffer(buffer);
 		std::cout << "BEFORE : '" << client->getReadBuffer() << "'"<< std::endl;
-		if (bytesRead == 1)
-			client->setReadBuffer("");
-		else
+		// if (bytesRead == 1)
+		// 	client->setReadBuffer("");
+		std::string temp_buffer = client->getReadBuffer();
+		std::string::size_type	pos;
+		while ((pos = temp_buffer.find('\n')) != std::string::npos) 
 		{
-			std::string temp_buffer = client->getReadBuffer();
-			std::string temp = temp_buffer.substr(0, temp_buffer.find('\n'));
-			std::cout << "temp : '" << temp << "'"<< std::endl;
-			std::string::size_type	pos;
-			while ((pos = temp_buffer.find('\n')) != std::string::npos) 
-			{
-				std::string	command = temp_buffer.substr(0, pos);
-				temp_buffer.erase(0, pos + 1);
-				this->parseMessage(client, temp, pollfds);
-				// client->setReadBuffer(client->getReadBuffer().erase(client->getReadBuffer().size() - 1, 1));
-			}
+			std::string	command = temp_buffer.substr(0, pos);
+			temp_buffer.erase(0, pos + 1);
+			this->parseMessage(client, command, pollfds);
 		}
-		
 		std::cout << "AFTER : '" << client->getReadBuffer() << "'"<< std::endl;
 		std::cout << "\033[32m[INFO]\033[0m Message: " << buffer << std::endl;
 		std::cout << YELLOW << "[DEBUG]" << RESET << " Message parsed" << std::endl;
 	}
-		
-	
+
 	return 0;
 }
 
