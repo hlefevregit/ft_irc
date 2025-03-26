@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/21 19:46:55 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/26 19:01:35 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,9 @@
 #include "Colors.hpp"
 #include "Command.hpp"
 #include "numericalReplies.hpp"
+#include "Grid.hpp"
+
+#define SERVER_NAME "ircserv"
 
 #define NICKNAME 0
 #define USERNAME 1
@@ -67,13 +70,12 @@ struct clientState {
 class Server
 {
 private:	
-	int						_serverSocket;
-	std::vector<pollfd> 	_pollfds;
-	std::map<const int, Client>	_clients;
-	std::string				_password;
-	std::map<int, clientState> _clientStates;
-	std::string		_datetime;
-
+	int								_serverSocket;
+	std::string						_password;
+	std::string						_datetime;
+	std::vector<pollfd> 			_pollfds;
+	std::map<const int, Client>		_clients;
+	std::map<int, clientState>		_clientStates;
 	std::map<std::string, Channel>	_channels;
 
 
@@ -88,13 +90,14 @@ public:
 	std::map<const int, Client>	&getClients();
 	std::map<std::string, Channel>	&getChannels();
 
+
 	int		acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds);
 	int		readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it);
 
 	void	addClient(int clientSocket, std::vector<pollfd> &pollfds);
 	void	deleteClient(std::vector<pollfd> &pollfds, const std::vector<pollfd>::iterator &it, int fd);
 
-	int		parseMessage(Client *client, const std::string &message);
+	int		parseMessage(Client *client, const std::string &message, std::vector<pollfd> &pollfds);
 
 	void	joinCommand(Client client, std::string &channelName);
 	void	addClientToChannel(Client client, const std::string &channelName);
@@ -107,13 +110,22 @@ public:
 
 
 	// ldalmass
-	// std::map<const int, Client>::iterator	getClientByNickname(const std::string &nickname);
+	std::map<const int, Client>::iterator	getClientByNickname(const std::string &nickname);
+	bool									isNicknameAvailable(std::string &nickname);
 
-	// int		sendMessage(Client sender, std::string &params);
-	// void	sendMessageUser(std::string &msg, const std::string &nickname, Client &sender);
+	int		sendMessage(Client sender, std::string &params);
+	void	sendMessageUser(std::string &msg, const std::string &nickname, Client &sender);
 	
 	// void	botParse(Client sender, std::string &params);
 	// void	botHelp(Client sender);
+
+	void	sendCapabilities(Client &sender);
+	void	testCommand(Client &sender);
+	void	changeNickname(Client &sender, std::string &params);
+	void	changeUsername(Client &sender, std::string &params);
+	void	connectToServerWithPass(Client &sender, std::string &params);
+	void	quitServer(Client &sender, std::vector<pollfd> &pollfds);
+	void	authenticateClient(Client &sender);
 };
 
 void 	sendChillguy(int clientSocket);

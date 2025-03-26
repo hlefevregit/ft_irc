@@ -6,13 +6,13 @@
 #    By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/23 13:36:33 by hulefevr          #+#    #+#              #
-#    Updated: 2025/03/21 17:00:44 by ldalmass         ###   ########.fr        #
+#    Updated: 2025/03/26 18:39:41 by ldalmass         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC		=	c++
 
-CFLAGS	=	-Werror -Wall -Wextra -std=c++98 -Wno-shadow -fsanitize=address
+CFLAGS	=	-Werror -Wall -Wextra -std=c++98 -Wno-shadow -g
 
 SRC		=	main.cpp \
 			./src/Client.cpp \

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/31 15:48:01 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/03/26 19:20:27 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,27 @@ int Client::authentification(Client *client) {
 		return 1;
 	}
 	return 0;
+}
+
+std::string	Client::getDataSentByClientCleaned(int fd)
+{
+	char buffer[1024];
+	std::memset(buffer, 0, sizeof(buffer));
+	int bytesRead = recv(fd, buffer, sizeof(buffer), 0);
+
+	if (bytesRead < 0)
+	{
+		std::cerr << ERROR << "Failed to read from client" << std::endl;
+		return (std::string(""));
+	}
+	else if (bytesRead == 0)
+	{
+		std::cout << INFO << "Client disconnected" << std::endl;
+		return (std::string(""));
+	}
+
+	std::string	cleanedMessage = messageCleaner(buffer);
+	return (cleanedMessage);
 }
 
 #include <fstream>

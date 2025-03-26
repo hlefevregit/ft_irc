@@ -295,7 +295,7 @@ void	write_line(std::string str, unsigned short max_col_lenght, int alignment, b
 	return;
 }
 
-void	printTable(t_cell_data &cell_data, unsigned short width, unsigned short x_cells, unsigned short y_cells)
+void	printGrid(t_cell_data &cell_data, unsigned short width, unsigned short x_cells, unsigned short y_cells)
 {
 	// Ensure width does not exceed terminal width
 	unsigned short	col = getTerminalWidth();

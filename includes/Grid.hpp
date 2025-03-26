@@ -59,7 +59,7 @@ void			printCeiling(unsigned short width, unsigned short max_cell_size);
 void			printFloor(unsigned short width, unsigned short max_cell_size);
 void			printYSeparator(unsigned short width, unsigned short max_cell_size);
 void			write_line(std::string str, unsigned short max_col_lenght, int alignment, bool is_last_cell);
-void			printTable(t_cell_data &cell_data, unsigned short width, unsigned short x_cells, unsigned short y_cells);
+void			printGrid(t_cell_data &cell_data, unsigned short width, unsigned short x_cells, unsigned short y_cells);
 std::string		trimWithoutTakingOutColorCodes(std::string input, int max_lenght);
 std::string		truncate_entry(std::string input, unsigned short max_lenght, unsigned short alignment);
 unsigned int	getStringLenghtWithoutColors(std::string &str);

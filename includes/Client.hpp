@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:58 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/01/29 11:49:27 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/26 19:20:36 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ public:
 
 	bool	hasUsername() const { return _hasUsername; };
 	bool	hasNickname() const { return _hasNickname; };
+	bool	hasPassword() const { return _hasNickname; };
 
 	int	authentification(Client *client);
 
@@ -66,6 +67,9 @@ public:
 	void changeNickname(std::string const &nickname);
 	void changeUsername(std::string const &username);
 	void changePassword(std::string const &password);
+
+	// ldalmass
+	std::string	getDataSentByClientCleaned(int fd);
 };
 
 #endif
