@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/27 18:31:35 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/27 21:39:01 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #define ERR_USERONCHANNEL(usr, channel) "443 " + usr + " " + channel + " :is already on channel\n"
 #define RPL_INVITING(channel, nick) "341 " + nick + " " + channel + " :Inviting\n"
 #define RPL_AWAY(nick, msg) "301 " + nick + " " + msg + " :away\n"
-#define RPL_WELCOME(nick, user, host) "001 " + nick + " :Welcome to our IRC server\n"
+#define RPL_WELCOME(nick) "001 " + nick + " :Welcome to our IRC server\n"
 #define RPL_YOURHOST(nick, user, host) "002 " + nick + " :Welcome to our IRC server\n"
 #define RPL_CREATED(nick, user, host) "003 " + nick + " :Welcome to our IRC server\n"
 #define RPL_MYINFO(nick, user, host) "003 " + nick + " :Welcome to our IRC server\n"
@@ -44,6 +44,7 @@ void    sendToUserErr403(int fd, const char *channel);
 #define ERR_CHANOPRIVSNEEDED(channel) "482 " + channel + " :You're not channel operator\n"
 #define ERR_USERNOTINCHANNEL(nick, channel) "441 " + nick + " " + channel + " :They aren't on that channel\n"
 
+
 /*---------------MODE-------------------*/
 
 #define ERR_KEYSET(channel) "467 " + channel + " :Channel key already set\n"
@@ -64,6 +65,7 @@ void    sendToUserErr403(int fd, const char *channel);
 #define ERR_RESTRICTED "484 :Your connection is restricted!\n"
 #define ERR_ERRONEUSNICKNAME(nick) "432 " + nick + " :Erroneus nickname\n"
 #define ERR_NONICKNAMEGIVEN "431 :No nickname given\n"
+#define NICK_CHANGE_ANNOUNCE(server, old_nick, new_nick) ":" + server + " " + old_nick + " NICK :" + new_nick + "\n"
 
 /*---------------PING-------------------*/
 
@@ -72,6 +74,7 @@ void    sendToUserErr403(int fd, const char *channel);
 
 /*---------------PASS-------------------*/
 
+#define ERR_WRONGPASSWORD(server) ":" server " 464 :Password incorrect\n"
 #define ERR_ALREADYREGISTRED "462 :Unauthorized command (already registered)\n"
 
 /*---------------PRIVMSG-------------------*/

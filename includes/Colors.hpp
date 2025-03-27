@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 12:18:44 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/03/18 15:18:46 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/27 22:37:21 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,10 @@
 # define INFO		"\033[0;34m[INFO]\033[0m  "
 # define DEBUG		"\033[0;33m[DEBUG]\033[0m "
 # define ERROR		"\033[0;31m[ERROR]\033[0m "
+
+# define IN			"┌─ IN  "
+# define WALL		"│  "
+# define OUT		"└─ OUT "
+# define TRAIL		" ───────┄┄╌┈"
 
 #endif

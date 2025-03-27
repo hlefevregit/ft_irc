@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/27 19:01:52 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/27 22:42:54 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,41 +97,6 @@ void Server::shutDownServer() {
 	std::cout << "Server shut down" << std::endl;
 }
 
-// void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds) {
-// 	pollfd pfd;
-// 	pfd.fd = clientSocket;
-// 	pfd.events = POLLIN;
-// 	Client newClient(clientSocket);
-	
-// 	_clients.insert(std::pair<int, Client>(clientSocket, newClient));
-// 	std::cout << "\033[32m[INFO]\033[0m New client added #" << clientSocket << std::endl;
-
-// 	std::string msg = "Welcome to the server, please enter the password: ";
-// 	send(clientSocket, msg.c_str(), msg.size(), 0);
-// 	char buffer[1024];
-// 	std::memset(buffer, 0, sizeof(buffer));
-// 	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
-// 	if (bytesRead < 0) {
-// 		std::cerr << "\033[31m[ERROR]\033[0m Failed to read from client" << std::endl;
-// 	} else if (bytesRead == 0) {
-// 		std::cout << "\033[32m[INFO]\033[0m Client disconnected" << std::endl;
-// 	} else {
-// 		std::string cleanPassword = messageCleaner(buffer);
-// 		if (cleanPassword != _password) {
-// 			std::string msg = "Wrong password\n";
-// 			send(clientSocket, msg.c_str(), msg.size(), 0);
-// 			std::cout << "\033[32m[INFO]\033[0m Wrong password, client disconnected" << std::endl;
-// 			close(clientSocket);
-// 		} else {
-// 			std::string msg = "Password accepted\n";
-// 			send(clientSocket, msg.c_str(), msg.size(), 0);
-// 			sendChillguy(clientSocket);
-// 			pollfds.push_back(pfd);
-// 			// _pollfds.push_back(pfd);
-// 		}
-// 	}
-// }
-
 void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds)
 {
 	Client		newClient(clientSocket);
@@ -209,52 +174,6 @@ Client *getClient(Server *server, int fd) {
 	return &it->second;
 }
 
-// int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it) {
-	
-// 	Client *client;
-// 	client = getClient(this, it->fd);
-	
-// 	char buffer[4096];
-// 	std::memset(buffer, 0, sizeof(buffer));
-// 	int bytesRead = recv(it->fd, buffer, sizeof(buffer), 0);
-
-// 	if (bytesRead < 0) {
-// 		std::cerr << "\033[31m[ERROR]\033[0m Failed to read from client" << std::endl;
-// 		deleteClient(pollfds, it, it->fd);
-// 		return 3;
-// 	} else if (bytesRead == 0) {
-// 		std::cout << "\033[32m[INFO]\033[0m Client disconnected" << std::endl;
-// 		deleteClient(pollfds, it, it->fd);
-// 		return 3;
-// 	} else {
-
-// 		std::cout << "\033[32m[INFO]\033[0m Received " << bytesRead << " bytes from client" << std::endl;
-// 		client->setReadBuffer(buffer);
-// 		if (bytesRead == 1)
-// 			client->setReadBuffer("");
-// 		else {
-// 			while (!client->getReadBuffer().empty() && 
-// 				(client->getReadBuffer()[client->getReadBuffer().size() - 1] == '\n' || 
-// 				client->getReadBuffer()[client->getReadBuffer().size() - 1] == '\r')) 
-// 			{
-// 				client->setReadBuffer(client->getReadBuffer().erase(client->getReadBuffer().size() - 1, 1));
-// 			}
-// 		}
-// 		std::cout << "\033[32m[INFO]\033[0m Message: " << buffer << std::endl;
-// 		try {
-// 			this->parseMessage(client, client->getReadBuffer());
-// 			if (client->getReadBuffer().find("\r\n"))
-// 				client->resetBuffer();
-// 		} catch (const std::exception &e) {
-// 			std::cerr << "\033[31m[ERROR]\033[0m " << e.what() << std::endl;
-// 			return 3;
-// 		}
-// 		std::cout << YELLOW << "[DEBUG]" << RESET << " Message parsed" << std::endl;
-// 	}
-		
-	
-// 	return 0;
-// }
 int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it) {
 	int fd = it->fd;
 
@@ -298,8 +217,6 @@ int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 	client->setReadBuffer(temp_buffer);
 	return 0;
 }
-
-
 
 void Server::run() {
 	
@@ -348,14 +265,18 @@ void Server::run() {
 
 void	Server::authenticateClient(Client &sender)
 {
-	std::cout << DEBUG << "│  ┌─ IN  authenticateClient ────────┐" << std::endl;
+	std::cout << INFO WALL WALL IN << "authenticateClient" << TRAIL << std::endl;
 	if (sender.hasNickname() && sender.hasUsername() && sender.hasPassword())
+	{
+		std::string	msg = RPL_WELCOME(sender.getNickname());
+		send(sender.getFd(), msg.c_str(), msg.size(), 0);
 		sender.authenticate();
+	}
 	if (sender.isAuthenticated() == true)
-		std::cout << DEBUG << "│  │  client #" << sender.getFd() << GREEN " is fully authentificated" RESET << std::endl;
+		std::cout << DEBUG WALL WALL WALL<< "client #" << sender.getFd() << GREEN " is fully authentificated" RESET << std::endl;
 	else
-		std::cout << DEBUG << "│  │  client #" << sender.getFd() << YELLOW " is not fully authentificated yet" RESET << std::endl;
-	std::cout << DEBUG << "│  └─ OUT authenticateClient ────────┘" << std::endl;
+		std::cout << DEBUG WALL WALL WALL << "client #" << sender.getFd() << YELLOW " is not fully authentificated yet" RESET << std::endl;
+	std::cout << INFO WALL WALL OUT << "authenticateClient" << TRAIL << std::endl;
 	return ;
 }
 
@@ -400,7 +321,7 @@ void	Server::sendAllUsers(const std::string &msg, const std::string &nickname)
 
 void	Server::connectToServerWithPass(Client &sender, std::string &params)
 {
-	std::cout << DEBUG << "┌─ IN  connectToServerWithPass ────────┐" << std::endl;
+	std::cout << INFO WALL IN << "connectToServerWithPass" << TRAIL << std::endl;
 	// Get PASS
 	// std::string::iterator	start = (params.begin() + params.find("PASS") + 5);
 	std::string::iterator	start = params.begin();
@@ -422,22 +343,26 @@ void	Server::connectToServerWithPass(Client &sender, std::string &params)
 	// Last checks
 	if (pass.empty())
 	{
-		std::cerr << ERROR << "│  pass empty !" << std::endl;
-		std::cout << DEBUG << "└─ OUT connectToServerWithPass ────────┘" << std::endl;
+		std::cerr << ERROR WALL WALL << "pass empty !" << std::endl;
+		std::cout << INFO WALL WALL OUT << "connectToServerWithPass" << TRAIL << std::endl;
 		return ;
 	}
-	std::cout << DEBUG << "│  extracted pass : " << pass << std::endl;
+	std::cout << DEBUG WALL WALL << "extracted pass : " << pass << std::endl;
 
 	// Authenticate user
 	if (pass == _password)
 	{
-		std::cout << INFO << "│  Client #" << sender.getFd() << " successfully authentificated" << std::endl;
+		std::cout << INFO WALL WALL << "Client #" << sender.getFd() << " successfully authentificated" << std::endl;
 		sender.setPassword(pass);
 		authenticateClient(sender);
 	}
 	else
-		std::cout << ERROR << "│  Client #" << sender.getFd() << " failed authentificate : Wrong password !" << std::endl;
-	std::cout << DEBUG << "└─ OUT connectToServerWithPass ────────┘" << std::endl;
+	{
+		std::string numerical = ERR_WRONGPASSWORD(SERVER_NAME);
+		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
+		std::cout << ERROR WALL WALL << "Client #" << sender.getFd() << " failed authentificate : Wrong password !" << std::endl;
+	}
+	std::cout << INFO WALL OUT << "connectToServerWithPass" << TRAIL << std::endl;
 }
 
 /*********************************************************************/
@@ -463,7 +388,7 @@ bool	Server::isNicknameAvailable(std::string &nickname)
 
 void	Server::changeNickname(Client &sender, std::string &params)
 {
-	std::cout << DEBUG << "┌─ IN  changeNickname ────────┐" << std::endl;
+	std::cout << INFO WALL IN << "changeNickname" << TRAIL << std::endl;
 
 	// Get nickname
 	std::string::iterator	start = params.begin();
@@ -497,21 +422,21 @@ void	Server::changeNickname(Client &sender, std::string &params)
 	{
 		std::string numerical = ERR_NONICKNAMEGIVEN;
 		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR << "│  Nickname empty !" << std::endl;
-		std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
+		std::cerr << ERROR WALL WALL << "Nickname empty !" << std::endl;
+		std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
 		return ;
 	}
 	std::string::iterator	authorizedCharsStart = nickname.begin();
 	std::string::iterator	authorizedCharsEnd = nickname.end();
-	std::string				authorizedChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-[]\^{}_";
+	std::string				authorizedChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-[]\\^{}_";
 	std::string				startWith = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	// Checks first letter of nickname
-	if (startWith.find(nickname[0]) != std::string::npos)
+	if (startWith.find(nickname[0]) == std::string::npos)
 	{
 		std::string numerical = ERR_ERRONEUSNICKNAME(nickname);
 		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR << "│  Erroneus nickname !" << std::endl;
-		std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
+		std::cerr << ERROR WALL WALL << "Erroneus nickname !" << std::endl;
+		std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
 		return ;
 	}
 	// Checks the rest of the nickname
@@ -522,8 +447,8 @@ void	Server::changeNickname(Client &sender, std::string &params)
 		{
 			std::string numerical = ERR_ERRONEUSNICKNAME(nickname);
 			send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-			std::cerr << ERROR << "│  Erroneus nickname !" << std::endl;
-			std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
+			std::cerr << ERROR WALL WALL << "Erroneus nickname !" << std::endl;
+			std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
 			return ;
 		}
 		++authorizedCharsStart;
@@ -532,16 +457,16 @@ void	Server::changeNickname(Client &sender, std::string &params)
 	{
 		std::string numerical = ERR_NICKNAMEINUSE(nickname);
 		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR << "│  Nickname is already in use !" << std::endl;
-		std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
+		std::cerr << ERROR WALL WALL << "Nickname is already in use !" << std::endl;
+		std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
 		return ;
 	}
-	std::cout << INFO << "│  User #" << sender.getFd() << std::endl;
-	std::cout << INFO << "│  Changed Nickname from " << sender.getNickname() << " to " << nickname << std::endl;
+	std::cout << INFO WALL WALL << "User #" << sender.getFd() << std::endl;
+	std::cout << INFO WALL WALL << "Changed Nickname from " << sender.getNickname() << " to " << nickname << std::endl;
 	sender.setNickname(nickname);
 	authenticateClient(sender);
 
-	std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
+	std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
 	return ;
 }
 
@@ -553,7 +478,7 @@ void	Server::changeNickname(Client &sender, std::string &params)
 
 void	Server::changeUsername(Client &sender, std::string &params)
 {
-	std::cout << DEBUG << "┌─ IN  changeUsername ────────┐" << std::endl;
+	std::cout << INFO WALL IN << "changeUsername" << TRAIL << std::endl;
 
 	// Get username
 	std::string::iterator	start = params.begin();
@@ -576,23 +501,25 @@ void	Server::changeUsername(Client &sender, std::string &params)
 	// Last checks
 	if (username.empty())
 	{
-		std::cerr << ERROR << "│  Nickname empty !" << std::endl;
-		std::cout << DEBUG << "└─ OUT changeUsername ────────┘" << std::endl;
+		std::string numerical = ERR_NEEDMOREPARAMS(std::string("USER"));
+		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
+		std::cerr << ERROR WALL WALL << "Nickname empty !" << std::endl;
+		std::cout << INFO WALL OUT << "changeUsername" << TRAIL << std::endl;
 		return ;
 	}
 	if (username == sender.getUsername())
 	{
-		std::cerr << INFO << "│  User is already using this username" << std::endl;
-		std::cout << DEBUG << "└─ OUT changeUsername ────────┘" << std::endl;
+		std::cerr << INFO  WALL WALL << "User is already using this username" << std::endl;
+		std::cout << INFO WALL OUT << "changeUsername" << TRAIL << std::endl;
 		return ;
 	}
 
-	std::cout << DEBUG << "│  User #" << sender.getFd() << std::endl;
-	std::cout << DEBUG << "│  Changed Username from " << sender.getUsername() << " to " << username << std::endl;
+	std::cout << DEBUG WALL WALL << "User #" << sender.getFd() << std::endl;
+	std::cout << INFO WALL WALL << "Changed Username from " << sender.getUsername() << " to " << username << std::endl;
 	sender.setUsername(username);
 	authenticateClient(sender);
 
-	std::cout << DEBUG << "└─ OUT changeUsername ────────┘" << std::endl;
+	std::cout << INFO WALL OUT << "changeUsername" << TRAIL << std::endl;
 	return ;
 }
 
@@ -604,15 +531,15 @@ void	Server::changeUsername(Client &sender, std::string &params)
 
 void Server::quitServer(Client &sender, std::vector<pollfd> &pollfds)
 {
-	std::cout << DEBUG << "┌─ IN  quitServer ────────────┐" << std::endl;
+	std::cout << INFO WALL WALL IN << "quitServer" << TRAIL << std::endl;
 
 	int fd = sender.getFd();
 
 	// Vérifier si le client est présent dans _clients
 	if (_clients.find(fd) == _clients.end())
 	{
-		std::cerr << ERROR << "│  The quitting client's fd is not present in our std::map!" << std::endl;
-		std::cout << DEBUG << "└─ OUT quitServer ────────────┘" << std::endl;
+		std::cerr << ERROR WALL WALL << "The quitting client's fd is not present in our std::map!" << std::endl;
+		std::cout << INFO WALL OUT << "quitServer" << TRAIL << std::endl;
 		return;
 	}
 
@@ -620,14 +547,14 @@ void Server::quitServer(Client &sender, std::vector<pollfd> &pollfds)
 	std::vector<pollfd>::iterator it = findPollfdIterator(fd, pollfds);
 	if (it == pollfds.end())
 	{
-		std::cerr << ERROR << "│  Could not find the matching fd in pollfds!" << std::endl;
-		std::cout << DEBUG << "└─ OUT quitServer ────────────┘" << std::endl;
+		std::cerr << ERROR WALL WALL << "Could not find the matching fd in pollfds!" << std::endl;
+		std::cout << INFO WALL  OUT << "quitServer" << TRAIL << std::endl;
 		return;
 	}
 
 	// Fermer proprement le client
 	deleteClient(pollfds, fd);
-	std::cout << DEBUG << "└─ OUT quitServer ────────────┘" << std::endl;
+	std::cout << INFO WALL  OUT << "quitServer" << TRAIL << std::endl;
 }
 
 
@@ -639,13 +566,13 @@ void Server::quitServer(Client &sender, std::vector<pollfd> &pollfds)
 
 void	Server::testCommand(Client &sender)
 {
-	std::cout << DEBUG << "┌─ IN  testCommand ────────────┐" << std::endl;
+	std::cout << INFO WALL WALL IN << "testCommand" << TRAIL << std::endl;
 
 	std::string	msg(10000000, 'A');
 	send(sender.getSocket(), msg.c_str(), msg.size(), 0);
 
 	send(sender.getSocket(), "B", 1, 0);
-	std::cout << DEBUG << "└─ OUT testCommand ────────────┘" << std::endl;
+	std::cout << INFO WALL WALL OUT << "testCommand" << TRAIL << std::endl;
 
 	return ;
 }
@@ -659,15 +586,16 @@ void	Server::testCommand(Client &sender)
 
 void	Server::sendCapabilities(Client &sender)
 {
-	std::cout << DEBUG << "┌─ IN  sendCapabilities ────────────┐" << std::endl;
+	std::cout << INFO WALL IN << "sendCapabilities" << TRAIL << std::endl;
 
 	// Return to HexChat that we do not have capabilities
 	std::string msg = ":" SERVER_NAME " CAP * LS :\r\n";
 	send(sender.getSocket(), msg.c_str(), msg.size(), 0);
-	std::cerr << DEBUG << "│  CAP LS 302 re triggered" << std::endl;
+	std::cerr << DEBUG WALL WALL << "CAP LS 302 triggered" << std::endl;
 
-	std::cout << DEBUG << "└─ OUT sendCapabilities ────────────┘" << std::endl;
+	std::cout << INFO WALL OUT << "sendCapabilities" << TRAIL << std::endl;
 	return ;
+
 }
 
 /*********************************************************************/
