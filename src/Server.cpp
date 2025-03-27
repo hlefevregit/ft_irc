@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/27 18:44:21 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/27 19:01:52 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,32 +141,6 @@ void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds)
 	pfd.fd = clientSocket;
 	pfd.events = POLLIN;
 
-	// /* Handling CAP LS */
-	// // Recieve message
-	// char buffer[1024];
-	// std::memset(buffer, 0, sizeof(buffer));
-	// int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
-
-	// if (bytesRead < 0)
-	// {
-	// 	std::cerr << ERROR << "Failed to read from client" << std::endl;
-	// 	return ;
-	// }
-	// else if (bytesRead == 0)
-	// {
-	// 	std::cout << INFO << "Client disconnected" << std::endl;
-	// 	return ;
-	// }
-	// message = messageCleaner(buffer);
-
-	// // Return to HexChat that we do not have capabilities
-	// if (message.find("CAP LS 302") != std::string::npos)
-	// {
-	// 	std::string msg = ":" SERVER_NAME " CAP * LS :\r\n";
-	// 	send(clientSocket, msg.c_str(), msg.size(), 0);
-	// 	// send(clientSocket, msg.c_str(), msg.size(), 0);
-	// }
-
 	/* Add new client to std::map<const int, Client> */
 	std::cout << INFO << "New unregistered client added #" << clientSocket << std::endl;
 	_clients.insert(std::pair<int, Client>(clientSocket, newClient));
@@ -290,7 +264,6 @@ int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 		deleteClient(pollfds, fd);
 		return 3;
 	}
-
 	char buffer[4096];
 	std::memset(buffer, 0, sizeof(buffer));
 	int bytesRead = recv(fd, buffer, sizeof(buffer), 0);
@@ -304,7 +277,6 @@ int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 		deleteClient(pollfds, fd);
 		return 3;
 	}
-
 	std::cout << GREEN << "[INFO] Received " << bytesRead << " bytes from client " << fd << RESET << std::endl;
 	client->setReadBuffer(buffer);
 
@@ -429,45 +401,42 @@ void	Server::sendAllUsers(const std::string &msg, const std::string &nickname)
 void	Server::connectToServerWithPass(Client &sender, std::string &params)
 {
 	std::cout << DEBUG << "┌─ IN  connectToServerWithPass ────────┐" << std::endl;
-	if (!sender.hasNickname() && !sender.hasUsername())
+	// Get PASS
+	// std::string::iterator	start = (params.begin() + params.find("PASS") + 5);
+	std::string::iterator	start = params.begin();
+	std::string				pass = std::string(start, params.end());
+
+	// Get position of the end of the pass
+	size_t	endPos = 0;
+	while (start != params.end())
 	{
-		// Get PASS
-		// std::string::iterator	start = (params.begin() + params.find("PASS") + 5);
-		std::string::iterator	start = params.begin();
-		std::string				pass = std::string(start, params.end());
-
-		// Get position of the end of the pass
-		size_t	endPos = 0;
-		while (start != params.end())
-		{
-			if (*start == ' ' || *start == '\n' || *start == '\r')	// Break to separator
-				break;
-			++endPos;
-			++start;
-		}
-
-		// Truncate pass until separator
-		pass = pass.substr(0, endPos);
-
-		// Last checks
-		if (pass.empty())
-		{
-			std::cerr << ERROR << "pass empty !" << std::endl;
-			std::cout << DEBUG << "└─ OUT connectToServerWithPass ────────┘" << std::endl;
-			return ;
-		}
-		std::cout << DEBUG << "│  extracted pass : " << pass << std::endl;
-
-		// Authenticate user
-		if (pass == _password)
-		{
-			std::cout << DEBUG << "│  Client #" << sender.getFd() << " successfully authentificated" << std::endl;
-			sender.setPassword(pass);
-			authenticateClient(sender);
-		}
-		else
-			std::cout << ERROR << "│  Client #" << sender.getFd() << " failed authentificate : Wrong password !" << std::endl;
+		if (*start == ' ' || *start == '\n' || *start == '\r')	// Break to separator
+			break;
+		++endPos;
+		++start;
 	}
+
+	// Truncate pass until separator
+	pass = pass.substr(0, endPos);
+
+	// Last checks
+	if (pass.empty())
+	{
+		std::cerr << ERROR << "│  pass empty !" << std::endl;
+		std::cout << DEBUG << "└─ OUT connectToServerWithPass ────────┘" << std::endl;
+		return ;
+	}
+	std::cout << DEBUG << "│  extracted pass : " << pass << std::endl;
+
+	// Authenticate user
+	if (pass == _password)
+	{
+		std::cout << INFO << "│  Client #" << sender.getFd() << " successfully authentificated" << std::endl;
+		sender.setPassword(pass);
+		authenticateClient(sender);
+	}
+	else
+		std::cout << ERROR << "│  Client #" << sender.getFd() << " failed authentificate : Wrong password !" << std::endl;
 	std::cout << DEBUG << "└─ OUT connectToServerWithPass ────────┘" << std::endl;
 }
 
@@ -526,24 +495,49 @@ void	Server::changeNickname(Client &sender, std::string &params)
 	// Last checks
 	if (nickname.empty())
 	{
-	std::cerr << ERROR << "│  Nickname empty !" << std::endl;
-	std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
-		return ;
-	}
-	if (nickname == sender.getNickname())
-	{
-		std::cerr << INFO << "│  User is already using this nickname !" << std::endl;
+		std::string numerical = ERR_NONICKNAMEGIVEN;
+		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
+		std::cerr << ERROR << "│  Nickname empty !" << std::endl;
 		std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
 		return ;
 	}
-	if (!isNicknameAvailable(nickname))
+	std::string::iterator	authorizedCharsStart = nickname.begin();
+	std::string::iterator	authorizedCharsEnd = nickname.end();
+	std::string				authorizedChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-[]\^{}_";
+	std::string				startWith = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	// Checks first letter of nickname
+	if (startWith.find(nickname[0]) != std::string::npos)
 	{
-		std::cerr << INFO << "│  nickname already taken !" << std::endl;
+		std::string numerical = ERR_ERRONEUSNICKNAME(nickname);
+		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
+		std::cerr << ERROR << "│  Erroneus nickname !" << std::endl;
 		std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
 		return ;
 	}
-	std::cout << DEBUG << "│  User #" << sender.getFd() << std::endl;
-	std::cout << DEBUG << "│  Changed Nickname from " << sender.getNickname() << " to " << nickname << std::endl;
+	// Checks the rest of the nickname
+	++authorizedCharsStart;
+	while (authorizedCharsStart != authorizedCharsEnd)
+	{
+		if (authorizedChars.find(*authorizedCharsStart) == std::string::npos)
+		{
+			std::string numerical = ERR_ERRONEUSNICKNAME(nickname);
+			send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
+			std::cerr << ERROR << "│  Erroneus nickname !" << std::endl;
+			std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
+			return ;
+		}
+		++authorizedCharsStart;
+	}
+	if (!isNicknameAvailable(nickname) || nickname == sender.getNickname())
+	{
+		std::string numerical = ERR_NICKNAMEINUSE(nickname);
+		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
+		std::cerr << ERROR << "│  Nickname is already in use !" << std::endl;
+		std::cout << DEBUG << "└─ OUT changeNickname ────────┘" << std::endl;
+		return ;
+	}
+	std::cout << INFO << "│  User #" << sender.getFd() << std::endl;
+	std::cout << INFO << "│  Changed Nickname from " << sender.getNickname() << " to " << nickname << std::endl;
 	sender.setNickname(nickname);
 	authenticateClient(sender);
 
@@ -594,7 +588,7 @@ void	Server::changeUsername(Client &sender, std::string &params)
 	}
 
 	std::cout << DEBUG << "│  User #" << sender.getFd() << std::endl;
-	std::cout << DEBUG << "│  Changed Nickname from " << sender.getUsername() << " to " << username << std::endl;
+	std::cout << DEBUG << "│  Changed Username from " << sender.getUsername() << " to " << username << std::endl;
 	sender.setUsername(username);
 	authenticateClient(sender);
 
