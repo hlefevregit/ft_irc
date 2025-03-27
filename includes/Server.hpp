@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/26 19:01:35 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:33:50 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,8 @@ public:
 	int		readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it);
 
 	void	addClient(int clientSocket, std::vector<pollfd> &pollfds);
-	void	deleteClient(std::vector<pollfd> &pollfds, const std::vector<pollfd>::iterator &it, int fd);
+	void 	deleteClient(std::vector<pollfd> &pollfds, int fd);
+
 
 	int		parseMessage(Client *client, const std::string &message, std::vector<pollfd> &pollfds);
 
@@ -126,6 +127,10 @@ public:
 	void	connectToServerWithPass(Client &sender, std::string &params);
 	void	quitServer(Client &sender, std::vector<pollfd> &pollfds);
 	void	authenticateClient(Client &sender);
+
+	/*********************UTILS*********************************/
+
+	std::vector<pollfd>::iterator findPollfdIterator(int fd, std::vector<pollfd> &pollfds);
 };
 
 void 	sendChillguy(int clientSocket);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/26 22:34:01 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:44:21 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,13 +175,26 @@ void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds)
 	return ;
 }
 
-void Server::deleteClient(std::vector<pollfd> &pollfds, const std::vector<pollfd>::iterator &it, int fd) {
+void Server::deleteClient(std::vector<pollfd> &pollfds, int fd) {
 	std::cout << "\033[32m[INFO]\033[0m Deconnecting client #" << fd << std::endl;
+
+	// 1. Fermer le socket
 	close(fd);
-	_clients.erase(fd);
-	pollfds.erase(it);
-	std::cout << "\033[32m[INFO]\033[0m Total client: " << _clients.size() << std::endl;
+
+	// 2. Supprimer le client du map
+	if (_clients.find(fd) != _clients.end())
+		_clients.erase(fd);
+
+	// 3. Trouver l'itérateur pollfd et le supprimer
+	std::vector<pollfd>::iterator it = findPollfdIterator(fd, pollfds);
+	if (it != pollfds.end())
+		pollfds.erase(it);
+	else
+		std::cerr << "\033[33m[WARN]\033[0m pollfd for fd " << fd << " not found." << std::endl;
+
+	std::cout << "\033[32m[INFO]\033[0m Total clients: " << _clients.size() << std::endl;
 }
+
 
 int Server::acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds) {
 	sockaddr_in clientAddr;
@@ -268,52 +281,52 @@ Client *getClient(Server *server, int fd) {
 	
 // 	return 0;
 // }
+int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it) {
+	int fd = it->fd;
 
+	Client* client = getClient(this, fd);
+	if (!client) {
+		std::cerr << RED << "[ERROR] Client not found for fd " << fd << RESET << std::endl;
+		deleteClient(pollfds, fd);
+		return 3;
+	}
 
-int	Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it) {
-	
-	Client *client;
-	client = getClient(this, it->fd);
-	
 	char buffer[4096];
 	std::memset(buffer, 0, sizeof(buffer));
-	int bytesRead = recv(it->fd, buffer, sizeof(buffer), 0);
+	int bytesRead = recv(fd, buffer, sizeof(buffer), 0);
 
-	if (bytesRead < 0)
-	{
-		std::cerr << "\033[31m[ERROR]\033[0m Failed to read from client" << std::endl;
-		deleteClient(pollfds, it, it->fd);
+	if (bytesRead <= 0) {
+		if (bytesRead == 0)
+			std::cout << GREEN << "[INFO] Client disconnected: " << fd << RESET << std::endl;
+		else
+			std::cerr << RED << "[ERROR] Failed to read from client " << fd << RESET << std::endl;
+
+		deleteClient(pollfds, fd);
 		return 3;
 	}
-	else if (bytesRead == 0)
-	{
-		std::cout << "\033[32m[INFO]\033[0m Client disconnected" << std::endl;
-		deleteClient(pollfds, it, it->fd);
-		return 3;
-	}
-	else
-	{
 
-		std::cout << "\033[32m[INFO]\033[0m Received " << bytesRead << " bytes from client" << std::endl;
-		client->setReadBuffer(buffer);
-		std::cout << "BEFORE : '" << client->getReadBuffer() << "'"<< std::endl;
-		// if (bytesRead == 1)
-		// 	client->setReadBuffer("");
-		std::string temp_buffer = client->getReadBuffer();
-		std::string::size_type	pos;
-		while ((pos = temp_buffer.find('\n')) != std::string::npos) 
-		{
-			std::string	command = temp_buffer.substr(0, pos);
-			temp_buffer.erase(0, pos + 1);
-			this->parseMessage(client, command, pollfds);
-		}
-		std::cout << "AFTER : '" << client->getReadBuffer() << "'"<< std::endl;
-		std::cout << "\033[32m[INFO]\033[0m Message: " << buffer << std::endl;
-		std::cout << YELLOW << "[DEBUG]" << RESET << " Message parsed" << std::endl;
+	std::cout << GREEN << "[INFO] Received " << bytesRead << " bytes from client " << fd << RESET << std::endl;
+	client->setReadBuffer(buffer);
+
+	std::string temp_buffer = client->getReadBuffer();
+	std::string::size_type pos;
+
+	while ((pos = temp_buffer.find('\n')) != std::string::npos) {
+		std::string command = temp_buffer.substr(0, pos);
+		temp_buffer.erase(0, pos + 1);
+
+		// ⚠️ parseMessage peut déclencher un QUIT → potentielle suppression !
+		this->parseMessage(client, command, pollfds);
+
+		// 🔒 On vérifie que le client existe toujours avant de continuer
+		client = getClient(this, fd);
+		if (!client) return 3;
 	}
 
+	client->setReadBuffer(temp_buffer);
 	return 0;
 }
+
 
 
 void Server::run() {
@@ -595,34 +608,34 @@ void	Server::changeUsername(Client &sender, std::string &params)
 /*********************************************************************/
 /*********************************************************************/
 
-void	Server::quitServer(Client &sender, std::vector<pollfd> &pollfds)
+void Server::quitServer(Client &sender, std::vector<pollfd> &pollfds)
 {
 	std::cout << DEBUG << "┌─ IN  quitServer ────────────┐" << std::endl;
 
-	std::map<const int, Client>::iterator	start = _clients.begin();
-	std::map<const int, Client>::iterator	end = _clients.end();
-	const std::vector<pollfd>::iterator		it = pollfds.begin() + sender.getFd();
+	int fd = sender.getFd();
 
-	// Check if file descriptor correspond to a Client's file descriptor
-	while (start != end)
+	// Vérifier si le client est présent dans _clients
+	if (_clients.find(fd) == _clients.end())
 	{
-		if (start->second.getFd() == sender.getFd())
-			break;
-		++start;
-	}
-
-	// Delete client and close associated fd/socket
-	if (start == end)	// Case its not found (should never happen)
-	{
-		std::cerr << ERROR << "│  The quiting client's fd is not present in our std::map !" << std::endl;
+		std::cerr << ERROR << "│  The quitting client's fd is not present in our std::map!" << std::endl;
 		std::cout << DEBUG << "└─ OUT quitServer ────────────┘" << std::endl;
-		return ;
+		return;
 	}
-	deleteClient(pollfds, it, sender.getFd());
-	std::cout << DEBUG << "└─ OUT quitServer ────────────┘" << std::endl;
 
-	return ;
+	// Vérifier si le pollfd correspondant existe
+	std::vector<pollfd>::iterator it = findPollfdIterator(fd, pollfds);
+	if (it == pollfds.end())
+	{
+		std::cerr << ERROR << "│  Could not find the matching fd in pollfds!" << std::endl;
+		std::cout << DEBUG << "└─ OUT quitServer ────────────┘" << std::endl;
+		return;
+	}
+
+	// Fermer proprement le client
+	deleteClient(pollfds, fd);
+	std::cout << DEBUG << "└─ OUT quitServer ────────────┘" << std::endl;
 }
+
 
 /*********************************************************************/
 /*********************************************************************/
