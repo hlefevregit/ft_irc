@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/03/26 18:15:11 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/27 17:31:51 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,17 +93,17 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 			// UNAUTHENTICATED USERS COMMANDS
 			if (sender->second.isAuthenticated() == false)
 			{
-				if (msg.find("CAP LS 302") != std::string::npos)
+				if (cmd.command == "CAP" && cmd.params == "LS 302" )
 					sendCapabilities(sender->second);
-				else if (msg.find("USER") != std::string::npos)
+				else if (cmd.command == "USER")
 					changeUsername(sender->second, cmd.params);
-				else if (msg.find("TEST") != std::string::npos)
+				else if (cmd.command == "TEST")
 					testCommand(sender->second);
-				else if (msg.find("PASS") != std::string::npos)
+				else if (cmd.command == "PASS")
 					connectToServerWithPass(sender->second, cmd.params);
-				else if (msg.find("NICK") != std::string::npos)
+				else if (cmd.command == "NICK")
 					changeNickname(sender->second, cmd.params);
-				else if (msg.find("QUIT") != std::string::npos)
+				else if (cmd.command == "QUIT")
 					quitServer(sender->second, pollfds);
 				client->resetBuffer();
 			}
@@ -111,9 +111,9 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 			else
 			{
 				// sendAllUsers(msg, sender->second.getNickname());
-				if (msg.find("CAP LS 302") != std::string::npos)
+				if (cmd.command == "CAP" && cmd.params == "LS 302" )
 					sendCapabilities(sender->second);
-				else if (msg.find("NICK") != std::string::npos)
+				else if (cmd.command == "NICK")
 					changeNickname(sender->second, cmd.params);
 				// 	if (cmd.command == "JOIN")
 				// 		joinCommand(sender->second, cmd.params);
@@ -131,13 +131,18 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 				// 		sender->second.leaveChannel(msg);
 				// 	else if (msg.find("PING") != std::string::npos)
 				// 		sender->second.ping(msg);
-				if (msg.find("PRIVMSG") != std::string::npos)
+				else if (cmd.command == "PRIVMSG")
 				{
 					sendMessage(sender->second, cmd.params);
 					// botParse(sender->second, cmd.params);
 				}
-				if (msg.find("QUIT") != std::string::npos)
+				else if (cmd.command == "QUIT")
 					quitServer(sender->second, pollfds);
+				else if (cmd.command == "PASS")
+				{
+					std::string numerical = ERR_ALREADYREGISTRED;
+					send(client->getFd(), numerical.c_str(), numerical. size(), 0);
+				}
 				// 	else if (msg.find("@joe") != std::string::npos || msg.find("/joe") != std::string::npos)
 				// 		botParse(sender->second, cmd.params);
 				// 		sender->second.sendMessage(sender->second, cmd.params);

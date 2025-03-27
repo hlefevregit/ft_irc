@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   numericalReplies.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hugolefevre <hugolefevre@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/02/03 16:59:02 by hugolefevre      ###   ########.fr       */
+/*   Updated: 2025/03/27 18:31:35 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,10 @@
 #define ERR_USERONCHANNEL(usr, channel) "443 " + usr + " " + channel + " :is already on channel\n"
 #define RPL_INVITING(channel, nick) "341 " + nick + " " + channel + " :Inviting\n"
 #define RPL_AWAY(nick, msg) "301 " + nick + " " + msg + " :away\n"
+#define RPL_WELCOME(nick, user, host) "001 " + nick + " :Welcome to our IRC server\n"
+#define RPL_YOURHOST(nick, user, host) "002 " + nick + " :Welcome to our IRC server\n"
+#define RPL_CREATED(nick, user, host) "003 " + nick + " :Welcome to our IRC server\n"
+#define RPL_MYINFO(nick, user, host) "003 " + nick + " :Welcome to our IRC server\n"
 
 /*---------------JOIN-------------------*/
 
