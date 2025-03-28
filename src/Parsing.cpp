@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/03/28 17:31:53 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/28 17:48:08 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,9 @@ static void splitMessage(std::vector<std::string> &cmds, std::string msg)
 int	Server::parseMessage(Client *client, std::string const &message, std::vector<pollfd> &pollfds)
 {
 	AUTO_LOG
-	// std::cout << INFO IN << "parseMessage" << TRAIL << std::endl;
 	std::vector<std::string>				cmds;
 	std::map<const int, Client>::iterator	sender = _clients.find(client->getFd());
 	
-	// std::cerr << DEBUG << "│  nb commands : "  << std::endl;
 	splitMessage(cmds, message);
 	
 	for (size_t i = 0; i != cmds.size(); i++)
@@ -140,10 +138,9 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 				// 		botParse(sender->second, cmd.params);
 				// 		sender->second.sendMessage(sender->second, cmd.params);
 			}
-			// client->resetBuffer();
+			client->resetBuffer();
 		}
 	}
 
-	// std::cout << INFO OUT << "parseMessage" << TRAIL << std::endl;
 	return 0;
 }
