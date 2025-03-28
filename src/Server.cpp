@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/28 17:28:44 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/28 19:15:48 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,34 +130,36 @@ void Server::deleteClient(std::vector<pollfd> &pollfds, int fd) {
 	if (it != pollfds.end())
 		pollfds.erase(it);
 	else
-		{LOG(ERROR "pollfd for fd " << fd << " not found.")}
+		{ LOG(ERROR "pollfd for fd " << fd << " not found.") }
 
 	LOG(INFO "Total clients: " << _clients.size())
 }
 
 
-int Server::acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds) {
+int Server::acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds)
+{
+	AUTO_LOG
 	sockaddr_in clientAddr;
 	socklen_t clientAddrLen = sizeof(clientAddr);
 	int clientSocket = accept(_serverSocket, (struct sockaddr*)&clientAddr, &clientAddrLen);
 	if (clientSocket < 0) {
 		if (errno == EINTR) {
-			std::cout << GREEN << "[INFO]" << RESET << " Signal received" << std::endl;
+			LOG(INFO "Signal received")
 			return 1;
 		}
-		std::cerr << "\033[31m[ERROR]\033[0m Failed to accept client" << std::endl;
+		LOG(ERROR "Failed to accept client")
 		return 2;
 	}
 	
 	if (pollfds.size() >= MAX_CLIENT) {
-		std::cerr << "\033[31m[ERROR]\033[0m Server is full" << std::endl;
+		LOG(ERROR "Server is full")
 		std::string msg = "Server is full\n";
 		send(clientSocket, msg.c_str(), msg.size(), 0);
 		close(clientSocket);
 	} else {
 		addClient(clientSocket, newPollfds);
-		std::cout << "\033[32m[INFO]\033[0m New client connected" << std::endl;
-	}
+		LOG(INFO "New client connected #" << clientSocket)
+		sendChillguy(clientSocket);}
 	return 0;
 	
 }
@@ -238,7 +240,7 @@ void Server::run() {
 
 
 	while (serverRunning == 1) {
-		std::cout << RED << "[INFO]" << RESET << " Server running = " << serverRunning << std::endl;
+		std::cout << std::endl << RED << "[INFO]" << RESET << " Server running = " << serverRunning << std::endl;
 		std::vector<pollfd> newPollfds;
 		
 		if (poll((pollfd *)&pollfds[0], (unsigned int)pollfds.size(), -1) < 0) {
@@ -279,6 +281,7 @@ void	Server::authenticateClient(Client &sender)
 	{
 		std::string	msg = RPL_WELCOME(sender.getNickname());
 		send(sender.getFd(), msg.c_str(), msg.size(), 0);
+		sendChad(sender.getFd());
 		// msg = RPL_YOURHOST(SERVER_NAME);
 		// send(sender.getFd(), msg.c_str(), msg.size(), 0);
 		// msg = RPL_CREATED();

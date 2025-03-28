@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/28 16:50:37 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/28 19:22:57 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@ extern volatile sig_atomic_t serverRunning;
 class Client;
 class Channel;
 
-struct FdMatcher {
+struct FdMatcher
+{
 	int fd;
 
 	FdMatcher(int fd) : fd(fd) {}
@@ -63,7 +64,8 @@ struct FdMatcher {
 	}
 };
 
-struct clientState {
+struct clientState
+{
 	bool authenticated;
 	int attempts;
 };
@@ -71,6 +73,7 @@ struct clientState {
 class Server
 {
 private:	
+
 	int								_serverSocket;
 	std::string						_password;
 	std::string						_datetime;
@@ -81,62 +84,71 @@ private:
 
 
 public:
+
 	Server(int port, const std::string &password, struct tm *timeinfo);
 	~Server();
 
-	void 	run();
-	void 	shutDownServer();
-	void 	setDatetime(struct tm *timeinfo);
-
-	std::map<const int, Client>	&getClients();
-	std::map<std::string, Channel>	&getChannels();
-
-
-	int		acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds);
-	int		readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it);
-
-	void	addClient(int clientSocket, std::vector<pollfd> &pollfds);
-	void 	deleteClient(std::vector<pollfd> &pollfds, int fd);
+	void			 						run();
+	void				 					shutDownServer();
+	void			 						setDatetime(struct tm *timeinfo);
+		
+	std::map<const int, Client>				&getClients();
+	std::map<std::string, Channel>			&getChannels();
 
 
-	int		parseMessage(Client *client, const std::string &message, std::vector<pollfd> &pollfds);
+	/******************************************************************/
+	/******************************CLIENT******************************/
+	/******************************************************************/
 
-	void	joinCommand(Client client, std::string &channelName);
-	void	addClientToChannel(Client client, const std::string &channelName);
-	
-	void	changeNickname(Client client, std::string const &nickname);
-	void	changeUsername(Client client, std::string const &username);
-	void	changePassword(Client client, std::string const &password);
+	int										acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &newPollfds);
+	int										readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it);
+	void									addClient(int clientSocket, std::vector<pollfd> &pollfds);
+	void						 			deleteClient(std::vector<pollfd> &pollfds, int fd);
+		
+		
+	/****************************************************************/
+	/******************************COMMANDS**************************/
+	/****************************************************************/
 
-	void	sendAllUsers(const std::string &msg, const std::string &nickname);
 
+	int										parseMessage(Client *client, const std::string &message, std::vector<pollfd> &pollfds);
+		
+	void									joinCommand(Client client, std::string &channelName);
+	void									addClientToChannel(Client client, const std::string &channelName);
+			
+	// void									changeNickname(Client client, std::string const &nickname);
+	// void									changeUsername(Client client, std::string const &username);
+	void									changePassword(Client client, std::string const &password);
+		
+	void									sendAllUsers(const std::string &msg, const std::string &nickname);
+
+	void									sendCapabilities(Client &sender);
+	void									testCommand(Client &sender);
+	void									changeNickname(Client &sender, std::string &params);
+	void									changeUsername(Client &sender, std::string &params);
+	void									connectToServerWithPass(Client &sender, std::string &params);
+	void									quitServer(Client &sender, std::vector<pollfd> &pollfds);
+	void									authenticateClient(Client &sender);
 
 	// ldalmass
 	std::map<const int, Client>::iterator	getClientByNickname(const std::string &nickname);
 	bool									isNicknameAvailable(std::string &nickname);
 
-	int		sendMessage(Client sender, std::string &params);
-	void	sendMessageUser(std::string &msg, const std::string &nickname, Client &sender);
+	int										sendMessage(Client sender, std::string &params);
+	void									sendMessageUser(std::string &msg, const std::string &nickname, Client &sender);
 	
 	// void	botParse(Client sender, std::string &params);
 	// void	botHelp(Client sender);
 
-	void	sendCapabilities(Client &sender);
-	void	testCommand(Client &sender);
-	void	changeNickname(Client &sender, std::string &params);
-	void	changeUsername(Client &sender, std::string &params);
-	void	connectToServerWithPass(Client &sender, std::string &params);
-	void	quitServer(Client &sender, std::vector<pollfd> &pollfds);
-	void	authenticateClient(Client &sender);
 
 	/*********************UTILS*********************************/
 
 	std::vector<pollfd>::iterator findPollfdIterator(int fd, std::vector<pollfd> &pollfds);
 };
 
-void 	sendChillguy(int clientSocket);
-void 	sendChad(int clientSocket);
+void 										sendChillguy(int clientSocket);
+void 										sendChad(int clientSocket);
 
-std::string messageCleaner(char *buffer);
+std::string 								messageCleaner(char *buffer);
 
 #endif

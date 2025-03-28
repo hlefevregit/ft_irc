@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Grid.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 22:38:06 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/03/27 22:38:07 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/28 18:24:37 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ typedef struct	s_cell_data
 class	AnsiToMircConverter
 {
 	private:
-		~AnsiToMircConverter();
 
 		std::map<int, int>	_ansiToMirc;
 		std::string			_intToString(int num) const;
@@ -61,6 +60,7 @@ class	AnsiToMircConverter
 
 	public:
 		AnsiToMircConverter();
+		~AnsiToMircConverter();
 
 		std::string	convertAnsiToMirc(const std::string &input) const;
 };
