@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/03/28 11:03:46 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/28 17:31:53 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,15 @@
 
 static void splitMessage(std::vector<std::string> &cmds, std::string msg)
 {
-	std::cout << INFO WALL IN << "splitMessage" << TRAIL << std::endl;
+	AUTO_LOG
+	// std::cout << INFO WALL IN << "splitMessage" << TRAIL << std::endl;
 	std::string::iterator	start = msg.begin();
 
 	while (start != msg.end())
 	{
 		std::string::iterator	end = std::find(start, msg.end(), '\n');
 		std::string				command = std::string(start, end);
-		std::cout << DEBUG WALL WALL YELLOW << "Command #" << cmds.size() << " -> " << command << RESET << std::endl;
+		LOG(DEBUG YELLOW << "Command #" << cmds.size() << " -> " << command << RESET)
 		command += '\n';
 		cmds.push_back(command);
 
@@ -33,13 +34,14 @@ static void splitMessage(std::vector<std::string> &cmds, std::string msg)
 
 	}
 	
-	std::cout << INFO WALL OUT << "splitMessage" << TRAIL << std::endl;
+	// std::cout << INFO WALL OUT << "splitMessage" << TRAIL << std::endl;
 	return ;
 }
 
 int	Server::parseMessage(Client *client, std::string const &message, std::vector<pollfd> &pollfds)
 {
-	std::cout << INFO IN << "parseMessage" << TRAIL << std::endl;
+	AUTO_LOG
+	// std::cout << INFO IN << "parseMessage" << TRAIL << std::endl;
 	std::vector<std::string>				cmds;
 	std::map<const int, Client>::iterator	sender = _clients.find(client->getFd());
 	
@@ -142,6 +144,6 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 		}
 	}
 
-	std::cout << INFO OUT << "parseMessage" << TRAIL << std::endl;
+	// std::cout << INFO OUT << "parseMessage" << TRAIL << std::endl;
 	return 0;
 }

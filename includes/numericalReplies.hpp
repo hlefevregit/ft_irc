@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/27 21:39:01 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/28 16:04:42 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 #define RPL_INVITING(channel, nick) "341 " + nick + " " + channel + " :Inviting\n"
 #define RPL_AWAY(nick, msg) "301 " + nick + " " + msg + " :away\n"
 #define RPL_WELCOME(nick) "001 " + nick + " :Welcome to our IRC server\n"
-#define RPL_YOURHOST(nick, user, host) "002 " + nick + " :Welcome to our IRC server\n"
-#define RPL_CREATED(nick, user, host) "003 " + nick + " :Welcome to our IRC server\n"
+#define RPL_YOURHOST(server) ":" server " 002 nickname :Your host is " server "\n"
+#define RPL_CREATED(server, nick, host) ":" server " 003 " nick " :This server was created Sat Mar 28 2025 at 12:00:00 UTC"
 #define RPL_MYINFO(nick, user, host) "003 " + nick + " :Welcome to our IRC server\n"
 
 /*---------------JOIN-------------------*/

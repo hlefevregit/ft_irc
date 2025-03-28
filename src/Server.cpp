@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/28 15:49:50 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/28 17:28:44 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,8 @@ void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds)
 }
 
 void Server::deleteClient(std::vector<pollfd> &pollfds, int fd) {
-	std::cout << "\033[32m[INFO]\033[0m Deconnecting client #" << fd << std::endl;
+	AUTO_LOG
+	LOG(INFO "Deconnecting client #" << fd)
 
 	// 1. Fermer le socket
 	close(fd);
@@ -129,9 +130,9 @@ void Server::deleteClient(std::vector<pollfd> &pollfds, int fd) {
 	if (it != pollfds.end())
 		pollfds.erase(it);
 	else
-		std::cerr << "\033[33m[WARN]\033[0m pollfd for fd " << fd << " not found." << std::endl;
+		{LOG(ERROR "pollfd for fd " << fd << " not found.")}
 
-	std::cout << "\033[32m[INFO]\033[0m Total clients: " << _clients.size() << std::endl;
+	LOG(INFO "Total clients: " << _clients.size())
 }
 
 
@@ -273,18 +274,23 @@ void Server::run() {
 
 void	Server::authenticateClient(Client &sender)
 {
-	std::cout << INFO WALL WALL IN << "authenticateClient" << TRAIL << std::endl;
+	AUTO_LOG
 	if (sender.hasNickname() && sender.hasUsername() && sender.hasPassword())
 	{
 		std::string	msg = RPL_WELCOME(sender.getNickname());
 		send(sender.getFd(), msg.c_str(), msg.size(), 0);
+		// msg = RPL_YOURHOST(SERVER_NAME);
+		// send(sender.getFd(), msg.c_str(), msg.size(), 0);
+		// msg = RPL_CREATED();
+		// send(sender.getFd(), msg.c_str(), msg.size(), 0);
+		// msg = RPL_MYINFO();
+		// send(sender.getFd(), msg.c_str(), msg.size(), 0);
 		sender.authenticate();
 	}
 	if (sender.isAuthenticated() == true)
-		std::cout << DEBUG WALL WALL WALL<< "client #" << sender.getFd() << GREEN " is fully authentificated" RESET << std::endl;
+		{LOG(DEBUG "client #" << sender.getFd() << GREEN " is fully authentificated" RESET)}
 	else
-		std::cout << DEBUG WALL WALL WALL << "client #" << sender.getFd() << YELLOW " is not fully authentificated yet" RESET << std::endl;
-	std::cout << INFO WALL WALL OUT << "authenticateClient" << TRAIL << std::endl;
+		{LOG(DEBUG "client #" << sender.getFd() << YELLOW " is not fully authentificated yet" RESET)}
 	return ;
 }
 
@@ -297,15 +303,14 @@ void	Server::authenticateClient(Client &sender)
 
 void Server::quitServer(Client &sender, std::vector<pollfd> &pollfds)
 {
-	std::cout << INFO WALL WALL IN << "quitServer" << TRAIL << std::endl;
+	AUTO_LOG
 
 	int fd = sender.getFd();
 
 	// Vérifier si le client est présent dans _clients
 	if (_clients.find(fd) == _clients.end())
 	{
-		std::cerr << ERROR WALL WALL << "The quitting client's fd is not present in our std::map!" << std::endl;
-		std::cout << INFO WALL OUT << "quitServer" << TRAIL << std::endl;
+		LOG(ERROR "The quitting client's fd is not present in our std::map!")
 		return;
 	}
 
@@ -313,14 +318,12 @@ void Server::quitServer(Client &sender, std::vector<pollfd> &pollfds)
 	std::vector<pollfd>::iterator it = findPollfdIterator(fd, pollfds);
 	if (it == pollfds.end())
 	{
-		std::cerr << ERROR WALL WALL << "Could not find the matching fd in pollfds!" << std::endl;
-		std::cout << INFO WALL  OUT << "quitServer" << TRAIL << std::endl;
+		LOG(ERROR "Could not find the matching fd in pollfds!")
 		return;
 	}
 
 	// Fermer proprement le client
 	deleteClient(pollfds, fd);
-	std::cout << INFO WALL  OUT << "quitServer" << TRAIL << std::endl;
 }
 
 
@@ -332,14 +335,12 @@ void Server::quitServer(Client &sender, std::vector<pollfd> &pollfds)
 
 void	Server::testCommand(Client &sender)
 {
-	std::cout << INFO WALL WALL IN << "testCommand" << TRAIL << std::endl;
+	AUTO_LOG
 
 	std::string	msg(10000000, 'A');
 	send(sender.getSocket(), msg.c_str(), msg.size(), 0);
 
 	send(sender.getSocket(), "B", 1, 0);
-	std::cout << INFO WALL WALL OUT << "testCommand" << TRAIL << std::endl;
-
 	return ;
 }
 
@@ -352,14 +353,13 @@ void	Server::testCommand(Client &sender)
 
 void	Server::sendCapabilities(Client &sender)
 {
-	std::cout << INFO WALL IN << "sendCapabilities" << TRAIL << std::endl;
+	AUTO_LOG
+	LOG(DEBUG "CAP LS 302 triggered")
 
 	// Return to HexChat that we do not have capabilities
 	std::string msg = ":" SERVER_NAME " CAP * LS :\r\n";
 	send(sender.getSocket(), msg.c_str(), msg.size(), 0);
-	std::cerr << DEBUG WALL WALL << "CAP LS 302 triggered" << std::endl;
 
-	std::cout << INFO WALL OUT << "sendCapabilities" << TRAIL << std::endl;
 	return ;
 
 }

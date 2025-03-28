@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Authentification.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:47:25 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/28 10:48:11 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/28 17:35:23 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 void	Server::connectToServerWithPass(Client &sender, std::string &params)
 {
-	std::cout << INFO WALL IN << "connectToServerWithPass" << TRAIL << std::endl;
+	AUTO_LOG
 	// Get PASS
 	// std::string::iterator	start = (params.begin() + params.find("PASS") + 5);
 	std::string::iterator	start = params.begin();
@@ -42,16 +42,15 @@ void	Server::connectToServerWithPass(Client &sender, std::string &params)
 	// Last checks
 	if (pass.empty())
 	{
-		std::cerr << ERROR WALL WALL << "pass empty !" << std::endl;
-		std::cout << INFO WALL WALL OUT << "connectToServerWithPass" << TRAIL << std::endl;
+		LOG(ERROR "pass empty !")
 		return ;
 	}
-	std::cout << DEBUG WALL WALL << "extracted pass : " << pass << std::endl;
+	LOG(DEBUG "extracted pass : " << pass )
 
 	// Authenticate user
 	if (pass == _password)
 	{
-		std::cout << INFO WALL WALL << "Client #" << sender.getFd() << " successfully authentificated" << std::endl;
+		LOG(INFO "Client #" << sender.getFd() << " successfully authentificated")
 		sender.setPassword(pass);
 		authenticateClient(sender);
 	}
@@ -59,9 +58,8 @@ void	Server::connectToServerWithPass(Client &sender, std::string &params)
 	{
 		std::string numerical = ERR_WRONGPASSWORD(SERVER_NAME);
 		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cout << ERROR WALL WALL << "Client #" << sender.getFd() << " failed authentificate : Wrong password !" << std::endl;
+		LOG(ERROR "Client #" << sender.getFd() << " failed authentificate : Wrong password !")
 	}
-	std::cout << INFO WALL OUT << "connectToServerWithPass" << TRAIL << std::endl;
 }
 
 /*********************************************************************/
@@ -87,7 +85,7 @@ bool	Server::isNicknameAvailable(std::string &nickname)
 
 void	Server::changeNickname(Client &sender, std::string &params)
 {
-	std::cout << INFO WALL IN << "changeNickname" << TRAIL << std::endl;
+	AUTO_LOG
 
 	// Get nickname
 	std::string::iterator	start = params.begin();
@@ -121,8 +119,7 @@ void	Server::changeNickname(Client &sender, std::string &params)
 	{
 		std::string numerical = ERR_NONICKNAMEGIVEN;
 		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR WALL WALL << "Nickname empty !" << std::endl;
-		std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
+		LOG(ERROR "Nickname empty !")
 		return ;
 	}
 	std::string::iterator	authorizedCharsStart = nickname.begin();
@@ -134,8 +131,7 @@ void	Server::changeNickname(Client &sender, std::string &params)
 	{
 		std::string numerical = ERR_ERRONEUSNICKNAME(nickname);
 		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR WALL WALL << "Erroneus nickname !" << std::endl;
-		std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
+		LOG(ERROR "Erroneus nickname !")
 		return ;
 	}
 	// Checks the rest of the nickname
@@ -146,8 +142,7 @@ void	Server::changeNickname(Client &sender, std::string &params)
 		{
 			std::string numerical = ERR_ERRONEUSNICKNAME(nickname);
 			send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-			std::cerr << ERROR WALL WALL << "Erroneus nickname !" << std::endl;
-			std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
+			LOG(ERROR "Erroneus nickname !")
 			return ;
 		}
 		++authorizedCharsStart;
@@ -156,16 +151,14 @@ void	Server::changeNickname(Client &sender, std::string &params)
 	{
 		std::string numerical = ERR_NICKNAMEINUSE(nickname);
 		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR WALL WALL << "Nickname is already in use !" << std::endl;
-		std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
+		LOG(ERROR "Nickname is already in use !")
 		return ;
 	}
-	std::cout << INFO WALL WALL << "User #" << sender.getFd() << std::endl;
-	std::cout << INFO WALL WALL << "Changed Nickname from " << sender.getNickname() << " to " << nickname << std::endl;
+	LOG(INFO "User #" << sender.getFd())
+	LOG(INFO "Changed Nickname from " << sender.getNickname() << " to " << nickname)
 	sender.setNickname(nickname);
 	authenticateClient(sender);
 
-	std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
 	return ;
 }
 
@@ -177,7 +170,7 @@ void	Server::changeNickname(Client &sender, std::string &params)
 
 void	Server::changeUsername(Client &sender, std::string &params)
 {
-	std::cout << INFO WALL IN << "changeUsername" << TRAIL << std::endl;
+	AUTO_LOG
 
 	// Get username
 	std::string::iterator	start = params.begin();
@@ -202,22 +195,19 @@ void	Server::changeUsername(Client &sender, std::string &params)
 	{
 		std::string numerical = ERR_NEEDMOREPARAMS(std::string("USER"));
 		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR WALL WALL << "Nickname empty !" << std::endl;
-		std::cout << INFO WALL OUT << "changeUsername" << TRAIL << std::endl;
+		LOG(ERROR "Nickname empty !")
 		return ;
 	}
 	if (username == sender.getUsername())
 	{
-		std::cerr << INFO  WALL WALL << "User is already using this username" << std::endl;
-		std::cout << INFO WALL OUT << "changeUsername" << TRAIL << std::endl;
+		LOG(INFO "User is already using this username")
 		return ;
 	}
 
-	std::cout << DEBUG WALL WALL << "User #" << sender.getFd() << std::endl;
-	std::cout << INFO WALL WALL << "Changed Username from " << sender.getUsername() << " to " << username << std::endl;
+	LOG(DEBUG "User #" << sender.getFd())
+	LOG(INFO "Changed Username from " << sender.getUsername() << " to " << username )
 	sender.setUsername(username);
 	authenticateClient(sender);
 
-	std::cout << INFO WALL OUT << "changeUsername" << TRAIL << std::endl;
 	return ;
 }
