@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/27 22:42:54 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:49:24 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,13 +176,13 @@ Client *getClient(Server *server, int fd) {
 
 int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it) {
 	int fd = it->fd;
-
 	Client* client = getClient(this, fd);
 	if (!client) {
 		std::cerr << RED << "[ERROR] Client not found for fd " << fd << RESET << std::endl;
 		deleteClient(pollfds, fd);
 		return 3;
 	}
+
 	char buffer[4096];
 	std::memset(buffer, 0, sizeof(buffer));
 	int bytesRead = recv(fd, buffer, sizeof(buffer), 0);
@@ -196,25 +196,35 @@ int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 		deleteClient(pollfds, fd);
 		return 3;
 	}
+
 	std::cout << GREEN << "[INFO] Received " << bytesRead << " bytes from client " << fd << RESET << std::endl;
-	client->setReadBuffer(buffer);
 
-	std::string temp_buffer = client->getReadBuffer();
+	// ✅ Append only new data to read buffer
+	std::string newData(buffer, bytesRead);
+	client->appendToReadBuffer(newData);
+	std::string totalBuffer = client->getReadBuffer();
+	std::cout << "[DEBUG] Buffer accumulated: " << totalBuffer << std::endl;
+
 	std::string::size_type pos;
+	std::cout << "BEFORE : '" << totalBuffer << "'" << std::endl;
 
-	while ((pos = temp_buffer.find('\n')) != std::string::npos) {
-		std::string command = temp_buffer.substr(0, pos);
-		temp_buffer.erase(0, pos + 1);
+	while ((pos = totalBuffer.find('\n')) != std::string::npos) {
+		std::string command = totalBuffer.substr(0, pos);
+		totalBuffer.erase(0, pos + 1);
 
-		// ⚠️ parseMessage peut déclencher un QUIT → potentielle suppression !
 		this->parseMessage(client, command, pollfds);
-
-		// 🔒 On vérifie que le client existe toujours avant de continuer
 		client = getClient(this, fd);
 		if (!client) return 3;
 	}
 
-	client->setReadBuffer(temp_buffer);
+	// ✅ Clean or keep leftover properly
+	if (!totalBuffer.empty()) {
+		client->setReadBuffer(totalBuffer);  // Keep only the unprocessed fragment
+	} else {
+		client->resetBuffer();               // Clean all
+	}
+
+	std::cout << "AFTER : '" << client->getReadBuffer() << "'" << std::endl;
 	return 0;
 }
 
@@ -280,248 +290,6 @@ void	Server::authenticateClient(Client &sender)
 	return ;
 }
 
-/*********************************************************************/
-/*********************************************************************/
-/*****************************CHANNEL HANDLER*************************/
-/*********************************************************************/
-/*********************************************************************/
-
-
-void Server::addClientToChannel(Client client, const std::string &channelName)
-{
-	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
-	std::string clientNick = client.getNickname();
-	if (it != _channels.end())
-	{
-		it->second.addUserToChannel(client);
-		std::cout << "\033[32m[INFO]\033[0m " << clientNick << " joined channel " << channelName << std::endl;
-		std::string msg = "You have successfully joined channel " + channelName + "\n";
-		send(client.getFd(), msg.c_str(), msg.size(), 0);
-	}
-	
-
-}
-
-void	Server::sendAllUsers(const std::string &msg, const std::string &nickname)
-{
-	std::map<const int, Client>::iterator it = _clients.begin();
-	while (it != _clients.end())
-	{
-		std::string message = nickname + ": " + msg + "\n";
-		send(it->first, message.c_str(), message.size(), 0);
-		it++;
-	}
-}
-
-/*********************************************************************/
-/*********************************************************************/
-/******************************    PASS    ***************************/
-/*********************************************************************/
-/*********************************************************************/
-
-void	Server::connectToServerWithPass(Client &sender, std::string &params)
-{
-	std::cout << INFO WALL IN << "connectToServerWithPass" << TRAIL << std::endl;
-	// Get PASS
-	// std::string::iterator	start = (params.begin() + params.find("PASS") + 5);
-	std::string::iterator	start = params.begin();
-	std::string				pass = std::string(start, params.end());
-
-	// Get position of the end of the pass
-	size_t	endPos = 0;
-	while (start != params.end())
-	{
-		if (*start == ' ' || *start == '\n' || *start == '\r')	// Break to separator
-			break;
-		++endPos;
-		++start;
-	}
-
-	// Truncate pass until separator
-	pass = pass.substr(0, endPos);
-
-	// Last checks
-	if (pass.empty())
-	{
-		std::cerr << ERROR WALL WALL << "pass empty !" << std::endl;
-		std::cout << INFO WALL WALL OUT << "connectToServerWithPass" << TRAIL << std::endl;
-		return ;
-	}
-	std::cout << DEBUG WALL WALL << "extracted pass : " << pass << std::endl;
-
-	// Authenticate user
-	if (pass == _password)
-	{
-		std::cout << INFO WALL WALL << "Client #" << sender.getFd() << " successfully authentificated" << std::endl;
-		sender.setPassword(pass);
-		authenticateClient(sender);
-	}
-	else
-	{
-		std::string numerical = ERR_WRONGPASSWORD(SERVER_NAME);
-		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cout << ERROR WALL WALL << "Client #" << sender.getFd() << " failed authentificate : Wrong password !" << std::endl;
-	}
-	std::cout << INFO WALL OUT << "connectToServerWithPass" << TRAIL << std::endl;
-}
-
-/*********************************************************************/
-/*********************************************************************/
-/******************************    NICK    ***************************/
-/*********************************************************************/
-/*********************************************************************/
-
-bool	Server::isNicknameAvailable(std::string &nickname)
-{
-	std::map<const int, Client>::iterator	start = _clients.begin();
-	std::map<const int, Client>::iterator	end = _clients.end();
-
-	// Check if nickname correspond to a any Client's nickname
-	while (start != end)
-	{
-		if (start->second.getNickname() == nickname)
-			return false;
-		++start;
-	}
-	return true;
-}
-
-void	Server::changeNickname(Client &sender, std::string &params)
-{
-	std::cout << INFO WALL IN << "changeNickname" << TRAIL << std::endl;
-
-	// Get nickname
-	std::string::iterator	start = params.begin();
-	std::string				nickname = std::string(start, params.end());
-
-	// Get position of the end of the nickname
-	size_t	endPos = 0;
-	while (start != params.end())
-	{
-		if (*start == ' ' || *start == '\n' || *start == '\r')	// No more a word we can stop counting
-			break;
-		++endPos;
-		++start;
-	}
-	endPos = endPos > 9 ? 9 : endPos;
-
-	// Truncate nickname to fit 9 chars
-	nickname = nickname.length() > 9 ? nickname.substr(0, endPos) : nickname;
-
-	// Trim spaces
-	start = nickname.begin();
-	std::string::iterator	end = nickname.end();
-
-	while (start != end && (*start == ' ' || *start == '\n' ||  *start == '\r'))
-		++start;
-
-	nickname = std::string(start, end);
-
-	// Last checks
-	if (nickname.empty())
-	{
-		std::string numerical = ERR_NONICKNAMEGIVEN;
-		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR WALL WALL << "Nickname empty !" << std::endl;
-		std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
-		return ;
-	}
-	std::string::iterator	authorizedCharsStart = nickname.begin();
-	std::string::iterator	authorizedCharsEnd = nickname.end();
-	std::string				authorizedChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-[]\\^{}_";
-	std::string				startWith = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	// Checks first letter of nickname
-	if (startWith.find(nickname[0]) == std::string::npos)
-	{
-		std::string numerical = ERR_ERRONEUSNICKNAME(nickname);
-		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR WALL WALL << "Erroneus nickname !" << std::endl;
-		std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
-		return ;
-	}
-	// Checks the rest of the nickname
-	++authorizedCharsStart;
-	while (authorizedCharsStart != authorizedCharsEnd)
-	{
-		if (authorizedChars.find(*authorizedCharsStart) == std::string::npos)
-		{
-			std::string numerical = ERR_ERRONEUSNICKNAME(nickname);
-			send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-			std::cerr << ERROR WALL WALL << "Erroneus nickname !" << std::endl;
-			std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
-			return ;
-		}
-		++authorizedCharsStart;
-	}
-	if (!isNicknameAvailable(nickname) || nickname == sender.getNickname())
-	{
-		std::string numerical = ERR_NICKNAMEINUSE(nickname);
-		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR WALL WALL << "Nickname is already in use !" << std::endl;
-		std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
-		return ;
-	}
-	std::cout << INFO WALL WALL << "User #" << sender.getFd() << std::endl;
-	std::cout << INFO WALL WALL << "Changed Nickname from " << sender.getNickname() << " to " << nickname << std::endl;
-	sender.setNickname(nickname);
-	authenticateClient(sender);
-
-	std::cout << INFO WALL OUT << "changeNickname" << TRAIL << std::endl;
-	return ;
-}
-
-/*********************************************************************/
-/*********************************************************************/
-/******************************    USER    ***************************/
-/*********************************************************************/
-/*********************************************************************/
-
-void	Server::changeUsername(Client &sender, std::string &params)
-{
-	std::cout << INFO WALL IN << "changeUsername" << TRAIL << std::endl;
-
-	// Get username
-	std::string::iterator	start = params.begin();
-	std::string				username = std::string(start, params.end());
-
-	// Get position of the end of the username
-	size_t	endPos = 0;
-	while (start != params.end())
-	{
-		if (*start == ' ' || *start == '\n' || *start == '\r')	// No more a word we can stop counting
-			break;
-		++endPos;
-		++start;
-	}
-	endPos = endPos > 9 ? 9 : endPos;
-
-	// Truncate username to fit 9 chars
-	username = username.length() > 9 ? username.substr(0, endPos) : username;
-
-	// Last checks
-	if (username.empty())
-	{
-		std::string numerical = ERR_NEEDMOREPARAMS(std::string("USER"));
-		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
-		std::cerr << ERROR WALL WALL << "Nickname empty !" << std::endl;
-		std::cout << INFO WALL OUT << "changeUsername" << TRAIL << std::endl;
-		return ;
-	}
-	if (username == sender.getUsername())
-	{
-		std::cerr << INFO  WALL WALL << "User is already using this username" << std::endl;
-		std::cout << INFO WALL OUT << "changeUsername" << TRAIL << std::endl;
-		return ;
-	}
-
-	std::cout << DEBUG WALL WALL << "User #" << sender.getFd() << std::endl;
-	std::cout << INFO WALL WALL << "Changed Username from " << sender.getUsername() << " to " << username << std::endl;
-	sender.setUsername(username);
-	authenticateClient(sender);
-
-	std::cout << INFO WALL OUT << "changeUsername" << TRAIL << std::endl;
-	return ;
-}
 
 /*********************************************************************/
 /*********************************************************************/
@@ -597,219 +365,3 @@ void	Server::sendCapabilities(Client &sender)
 	return ;
 
 }
-
-/*********************************************************************/
-/*********************************************************************/
-/*****************************    PRIVMSG    *************************/
-/*********************************************************************/
-/*********************************************************************/
-
-std::map<const int, Client>::iterator	Server::getClientByNickname(const std::string &nickname)
-{
-	std::map<const int, Client>::iterator	start = _clients.begin();
-	std::map<const int, Client>::iterator	end = _clients.end();
-
-	// Check if nickname correspond to a Client's nickname
-	while (start != end)
-	{
-		if (start->second.getNickname() == nickname)
-			return (start);
-		++start;
-	}
-	// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-	// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
-	std::cerr << ERROR << "getClientByNickname: nickname not found amongs clients !" << RESET << std::endl;
-	return (start);
-}
-
-void	Server::sendMessageUser(std::string &msg, const std::string &nickname, Client &sender)
-{
-	std::map<const int, Client>::iterator	reciever = getClientByNickname(nickname);
-	std::map<const int, Client>::iterator	client_end = _clients.end();
-
-	/****************/
-	/* Basic checks */
-	/****************/
-
-	// Check if the user is found in the server to send a message to
-	if (reciever->first == client_end->first)
-	{
-		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
-		std::cerr << ERROR << "sendMessageUser: client does not exist !" << RESET << std::endl;
-		return ;
-	}
-
-	// Check if the sender is sending a PRIVMSG to itself
-	if (sender.getNickname() == reciever->second.getNickname())
-	{
-		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
-		std::cerr << ERROR << "sendMessageUser: cannot send a PRIVMSG to itself !" << RESET << std::endl;
-		return ;
-	}
-
-	/***********************************/
-	/* Remove the targeted user in msg */
-	/***********************************/
-	std::string::iterator	start = msg.begin();
-	std::string::iterator	end = msg.end();
-
-	// Skips spaces
-	while (start != end && *start == ' ')
-		++start;
-	// Skips first word
-	while (start != end && *start != ' ')
-		++start;
-	// Skips spaces
-	while (start != end && *start == ' ')
-		++start;
-	// Skips the semicolon ':' if needed
-	if (start != end && *start == ':')
-		++start;
-	// Reform message
-	std::string	cleaned_message(start, end);
-	if (cleaned_message.empty())
-	{
-		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
-		std::cerr << ERROR << "sendMessageUser: cleaned_message is empty !" << RESET << std::endl;
-		return ;
-	}
-
-	/************************/
-	/* Send message to user */
-	/************************/
-	std::string	message = CYAN "Private message from [" + sender.getUsername() + "]: " + RESET + cleaned_message + "\n";
-	send(reciever->first, message.c_str(), message.size(), 0);
-
-	return ;
-}
-
-int    Server::sendMessage(Client sender, std::string &params)
-{
-	std::string				channel_prefix = "&#+!";
-	std::string				first_word;
-	std::string::iterator	start = params.begin();
-	std::string::iterator	end = params.end();
-
-	std::cout << DEBUG << "┌─ IN  sendMessage ───────────────────┐" << std::endl;
-
-	// Check if msg is empty
-	if (params.empty())
-	{
-		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
-		std::cerr << ERROR << "│  sendMessage: messsage is empty !   │" << RESET << std::endl;
-		std::cout << DEBUG << "└─ OUT sendMessage ───────────────────┘" << std::endl;
-		return 1;
-	}
-	// Skip leading spaces
-	while (start != end && *start == ' ')
-		++start;
-	// Get first word
-	while (start != end && *start != ' ')
-	{
-		first_word += *start;
-		++start;
-	}
-
-	std::cout << DEBUG << "│  first word : " << first_word << std::endl;
-
-	// Checks first word's prefix
-	if (first_word.size() > 1)
-	{
-		if (channel_prefix.find(first_word[0]) != std::string::npos)
-			std::cout << DEBUG << "│  is Channel" << RESET << std::endl;
-			// sendMessageChannel();    // TODO : dguerin implementation
-		else
-		{
-			std::cout << DEBUG << "│  is User" << RESET << std::endl;
-			sendMessageUser(params, first_word, sender);   // TODO : ldalmass implementation
-		}
-	}
-
-	std::cout << DEBUG << "└─ OUT sendMessage ───────────────────┘" << std::endl;
-	return 0;
-}
-
-/*********************************************************************/
-/*********************************************************************/
-/*****************************      BOT      *************************/
-/*********************************************************************/
-/*********************************************************************/
-
-// void	Server::botHelp(Client sender)
-// {
-// 	std::string	message = GREEN "Hey " + sender.getUsername() + " I'm joe !\n"
-// 	RESET "How to use :\n"
-// 	"PRIVMSG joe stats" + YELLOW + " - Display various server statistics.\n" + RESET +
-// 	"PRIVMSG joe user [nickname]" + YELLOW + " - Display informations about an user.\n" + RESET +
-// 	"PRIVMSG joe channel [channel's name]" + YELLOW + " - Display informations about a channel.\n" + RESET
-// 	;
-// 	send(sender.getFd(), message.c_str(), message.size(), 0);
-// 	return ;
-// }
-
-// void	Server::botParse(Client sender, std::string &params)
-// {
-// 	std::string				word;
-// 	std::string::iterator	start = params.begin();
-// 	std::string::iterator	end = params.end();
-
-// 	std::cout << DEBUG << "┌─ IN  botParse ──────────────────────┐" << std::endl;
-
-// 	// Check if msg is empty
-// 	if (params.empty())
-// 	{
-// 		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-// 		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
-// 		std::cerr << ERROR << "│  botParse: messsage is empty !      │" << RESET << std::endl;
-// 		std::cout << DEBUG << "└─ OUT botParse ──────────────────────┘" << std::endl;
-// 		return ;
-// 	}
-// 	// Skip leading spaces
-// 	while (start != end && *start == ' ')
-// 		++start;
-// 	// Skip first word spaces
-// 	while (start != end && *start != ' ')
-// 		++start;
-// 	// Skip spaces
-// 	while (start != end && *start == ' ')
-// 		++start;
-// 	// Get second word
-// 	while (start != end && *start != ' ')
-// 	{
-// 		word += *start;
-// 		++start;
-// 	}
-
-// 	std::cout << DEBUG << "│  magic word : " << word << std::endl;
-
-// 	// Check if command
-// 	if (!word.empty())
-// 	{
-// 		if (word == "stats")
-// 		{
-// 			std::cout << DEBUG << "│  is stats command" << RESET << std::endl;
-// 		}
-// 		else if (word == "user")
-// 		{
-// 			std::cout << DEBUG << "│  is user command" << RESET << std::endl;
-// 		}
-// 		else if (word == "channel")
-// 		{
-// 			std::cout << DEBUG << "│  is channel command" << RESET << std::endl;
-// 		}
-// 		else
-// 		{
-// 			std::cout << DEBUG << "└─ OUT botParse ──────────────────────┘" << std::endl;
-// 			return ;
-// 		}
-// 	}
-// 	else
-// 		botHelp(sender);
-
-// 	std::cout << DEBUG << "└─ OUT botParse ──────────────────────┘" << std::endl;
-// 	return ;
-// }

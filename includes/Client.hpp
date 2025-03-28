@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:58 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/26 19:20:36 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:45:26 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,41 +35,44 @@ public:
 	Client &operator=(const Client &src);
 	~Client();
 
-	int getSocket() const;
-	bool isAuthenticated() const;
-	void authenticate();
-
-	void	setNickname(const std::string &nickname) { _nickname = nickname; _hasNickname = true; };
-	void	setUsername(const std::string &username) { _username = username; _hasUsername = true; };
-	void	setPassword(const std::string &password) { _password = password; _hasPassword = true; };
-	void	setReadBuffer(std::string const &buf);
-
-	void	resetBuffer() { _readBuf.clear(); };
-
-	bool	hasUsername() const { return _hasUsername; };
-	bool	hasNickname() const { return _hasNickname; };
-	bool	hasPassword() const { return _hasNickname; };
-
-	int	authentification(Client *client);
+	int				getSocket() const;
+	bool			isAuthenticated() const;
+	void			authenticate();
+	
+	void			setNickname(const std::string &nickname) { _nickname = nickname; _hasNickname = true; };
+	void			setUsername(const std::string &username) { _username = username; _hasUsername = true; };
+	void			setPassword(const std::string &password) { _password = password; _hasPassword = true; };
+	void			setReadBuffer(std::string const &buf);
+	
+	void			resetBuffer() { _readBuf.clear(); };
+	void 			appendToReadBuffer(const std::string& str) {_readBuf += str; };
+	std::string&	getMutableReadBuffer() {return _readBuf;};
 
 
-	std::string getReadBuffer() const { return _readBuf; };
-	std::string getNickname() const { return _nickname; };
-	std::string getUsername() const { return _username; };
-	std::string getPassword() const { return _password; };
+	bool			hasUsername() const { return _hasUsername; };
+	bool			hasNickname() const { return _hasNickname; };
+	bool			hasPassword() const { return _hasNickname; };
+	
+	int				authentification(Client *client);
+	
+	
+	std::string 	getReadBuffer() const { return _readBuf; };
+	std::string 	getNickname() const { return _nickname; };
+	std::string 	getUsername() const { return _username; };
+	std::string 	getPassword() const { return _password; };
 
-	int getFd() const { return _socket; };
+	int				getFd() const { return _socket; };
 
 	/**********************************/
 	/*************COMMANDS*************/
 	/**********************************/
 
-	void changeNickname(std::string const &nickname);
-	void changeUsername(std::string const &username);
-	void changePassword(std::string const &password);
+	void 			changeNickname(std::string const &nickname);
+	void 			changeUsername(std::string const &username);
+	void 			changePassword(std::string const &password);
 
 	// ldalmass
-	std::string	getDataSentByClientCleaned(int fd);
+	std::string		getDataSentByClientCleaned(int fd);
 };
 
 #endif

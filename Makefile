@@ -6,7 +6,7 @@
 #    By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/23 13:36:33 by hulefevr          #+#    #+#              #
-#    Updated: 2025/03/27 18:26:56 by hulefevr         ###   ########.fr        #
+#    Updated: 2025/03/28 10:51:25 by hulefevr         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,6 +25,9 @@ SRC		=	main.cpp \
 			./src/cmd/changeID.cpp \
 			./src/Grid.cpp \
 			./src/Utils.cpp \
+			./src/cmd/Authentification.cpp \
+			./src/cmd/Privmsg.cpp \
+			./src/Bot.cpp \
 
 NAME	=	ircserv
 

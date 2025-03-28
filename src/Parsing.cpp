@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/03/27 22:45:59 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:03:46 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					break;
 				case 1:
 					sendToUserErr421(client->getFd(), cmd.command.c_str());
+					// client->resetBuffer();
 					return 1;
 				default:
 					break;
@@ -90,7 +91,7 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					changeNickname(sender->second, cmd.params);
 				else if (cmd.command == "QUIT")
 					quitServer(sender->second, pollfds);
-				client->resetBuffer();
+				// client->resetBuffer();
 			}
 			// AUTHENTICATED USERS COMMANDS
 			else
@@ -137,7 +138,7 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 				// 		botParse(sender->second, cmd.params);
 				// 		sender->second.sendMessage(sender->second, cmd.params);
 			}
-			client->resetBuffer();
+			// client->resetBuffer();
 		}
 	}
 
