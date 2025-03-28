@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/28 11:49:24 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/28 15:49:50 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,25 +206,23 @@ int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 	std::cout << "[DEBUG] Buffer accumulated: " << totalBuffer << std::endl;
 
 	std::string::size_type pos;
-	std::cout << "BEFORE : '" << totalBuffer << "'" << std::endl;
+	// std::cout << "BEFORE : '" << totalBuffer << "'" << std::endl;
 
-	while ((pos = totalBuffer.find('\n')) != std::string::npos) {
+	while ((pos = totalBuffer.find('\n')) != std::string::npos)
+	{
 		std::string command = totalBuffer.substr(0, pos);
 		totalBuffer.erase(0, pos + 1);
 
 		this->parseMessage(client, command, pollfds);
 		client = getClient(this, fd);
-		if (!client) return 3;
+		if (!client)
+			return 3;
 	}
 
-	// ✅ Clean or keep leftover properly
-	if (!totalBuffer.empty()) {
-		client->setReadBuffer(totalBuffer);  // Keep only the unprocessed fragment
-	} else {
-		client->resetBuffer();               // Clean all
-	}
+	if (totalBuffer.empty())
+		client->resetBuffer();
+	// std::cout << "AFTER : '" << client->getReadBuffer() << "'" << std::endl;
 
-	std::cout << "AFTER : '" << client->getReadBuffer() << "'" << std::endl;
 	return 0;
 }
 
