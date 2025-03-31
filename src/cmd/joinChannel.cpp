@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 10:52:09 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 16:12:15 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 18:57:52 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ void Server::joinCommand(Client &client, const std::string &params)
 		Channel *channel = getChannel(chanName);
 		if (!channel) {
 			// Création canal si inexistant
-			_channels[chanName] = Channel(chanName, client);
-			channel = &_channels[chanName];
+			channel = new Channel(chanName, client);
+			_channels[chanName] = channel;
 			LOG(INFO "Channel " << chanName << " created")
 		} else {
 			// Vérif +k
@@ -64,17 +64,50 @@ void Server::joinCommand(Client &client, const std::string &params)
 
 		if (!channel->hasMember(client))
 			client.joinedChannel(channel);
-
-		std::string joinMsg = ":" + client.getPrefix() + " JOIN " + chanName + "\r\n";
-		channel->broadcast(joinMsg);
-		LOG(INFO "Client " << client.getNickname() << " joined channel " << chanName)
-		// RPL_TOPIC si topic existant
-		if (!channel->getTopic().empty()) {
-			sendNumericReply(client.getFd(), 332, chanName + " :" + channel->getTopic());
-		}
-
 		// RPL_NAMREPLY + RPL_ENDOFNAMES
-		channel->sendNamesReply(client);
+		sendJoinReplies(client, *channel);
 		LOG(INFO "Client " << client.getNickname() << " joined channel " << chanName)
 	}
+}
+
+void Server::sendJoinReplies(Client &client, Channel &channel)
+{
+	AUTO_LOG
+	const std::string& channelName = channel.getName();
+	std::string nick = client.getNickname();
+	std::string prefix = client.getPrefix(); // ex: nick!user@host
+
+	// 1. JOIN
+	std::string joinMsg = prefix + " JOIN " + channelName + "\r\n";
+	LOG(INFO "Sending JOIN message to client " << client.getFd())
+	send(client.getFd(), joinMsg.c_str(), joinMsg.length(), 0);
+
+	// 2. RPL_TOPIC (332)
+	std::string topic = channel.getTopic();
+	if (topic.empty())
+		topic = "No topic is set";
+	std::string rplTopic = ":" + _serverName + " 332 " + nick + " " + channelName + " :" + topic + "\r\n";
+	send(client.getFd(), rplTopic.c_str(), rplTopic.length(), 0);
+
+	// // 3. RPL_TOPICWHOTIME (333)
+	// std::ostringstream oss;
+	// oss << ":" << _serverName << " 333 " << nick << " " << channelName << " "
+	// 	<< channel.getTopicSetter() << " " << channel.getTopicSetTime() << "\r\n";
+	// std::string topicWhoTime = oss.str();
+	// send(client.getFd(), topicWhoTime.c_str(), topicWhoTime.length(), 0);
+
+	// 4. RPL_NAMREPLY (353)
+	std::string nameList;
+	std::vector<std::string> members = channel.getMemberNames();
+	for (std::vector<std::string>::iterator it = members.begin(); it != members.end(); ++it) {
+		if (!nameList.empty())
+			nameList += " ";
+		nameList += *it;
+	}
+	std::string rplNames = ":" + _serverName + " 353 " + nick + " = " + channelName + " :" + nameList + "\r\n";
+	send(client.getFd(), rplNames.c_str(), rplNames.length(), 0);
+
+	// 5. RPL_ENDOFNAMES (366)
+	std::string rplEnd = ":" + _serverName + " 366 " + nick + " " + channelName + " :End of /NAMES list\r\n";
+	send(client.getFd(), rplEnd.c_str(), rplEnd.length(), 0);
 }

@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:45:49 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 16:08:02 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 19:16:52 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,9 @@
 
 Channel::Channel() {}
 Channel::Channel(const std::string& name) : _name(name), _topic("") {}
-Channel::~Channel() {}
+Channel::~Channel() {
+	std::cout << CYAN << "[INFO] " << RESET << "Channel " << _name << " destroyed" << std::endl;
+}
 
 Channel::Channel(const std::string& name, const Client& creator) : _name(name) {
 	_members[creator.getFd()] = const_cast<Client*>(&creator);
@@ -30,22 +32,22 @@ bool Channel::hasMember(const Client& client) const
 	return _members.find(client.getFd()) != _members.end();
 }
 
-void Channel::addMember(Client& client)
+void Channel::addMember(Client *client)
 {
-	_members[client.getFd()] = &client;
+	_members[client->getFd()] = client;
 }
 
 void Channel::removeMember(int fd)
 {
 	_members.erase(fd);
 }
-std::string Channel::getMemberNames() const
+std::vector<std::string> Channel::getMemberNames() const
 {
-	std::string names;
+	std::vector<std::string> names;
 	std::map<int, Client*>::const_iterator it;
 	for (it = _members.begin(); it != _members.end(); ++it)
 	{
-		names += it->second->getNickname() + " ";
+		names.push_back(it->second->getNickname());
 	}
 	return names;
 }
@@ -106,8 +108,8 @@ void Channel::sendNamesReply(Client &client) {
 
 Channel* Server::getChannel(const std::string &name)
 {
-	std::map<std::string, Channel>::iterator it = _channels.find(name);
+	std::map<std::string, Channel*>::iterator it = _channels.find(name);
 	if (it != _channels.end())
-		return &it->second;
+		return it->second;
 	return NULL;
 }

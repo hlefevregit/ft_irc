@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 16:34:45 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 18:49:29 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,12 +76,13 @@ class Server
 private:	
 
 	int								_serverSocket;
+	std::string						_serverName;
 	std::string						_password;
 	std::string						_datetime;
 	std::vector<pollfd> 			_pollfds;
 	std::map<const int, Client>		_clients;
 	std::map<int, clientState>		_clientStates;
-	std::map<std::string, Channel>	_channels;
+	std::map<std::string, Channel*>	_channels;
 
 
 public:
@@ -146,7 +147,7 @@ public:
 
 	Channel*								getChannel(const std::string &name);
 	void 									sendMessageChannel(std::string &params, std::string &first_word,  Client &sender);
-
+	void 									sendJoinReplies(Client &client, Channel &channel);
 	
 	/*********************UTILS*********************************/
 

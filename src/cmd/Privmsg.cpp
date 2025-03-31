@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:50:02 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 16:35:51 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 19:25:25 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,25 +178,29 @@ void Server::sendMessageChannel(std::string &params, std::string &first_word, Cl
 	
 
 	/***********************************/
-	/* Remove the targeted user in msg */
+	/* Remove the targeted chan in msg */
 	/***********************************/
-	std::string::iterator	start = params.begin();
-	std::string::iterator	end = params.end();
+	std::string::iterator it = params.begin();
+	std::string::iterator end = params.end();
 
-	// Skips spaces
-	while (start != end && *start == ' ')
-		++start;
-	// Skips first word
-	while (start != end && *start != ' ')
-		++start;
-	// Skips spaces
-	while (start != end && *start == ' ')
-		++start;
-	// Skips the semicolon ':' if needed
-	if (start != end && *start == ':')
-		++start;
-	// Reform message
-	std::string	cleaned_message(start, end);
+	// Skip leading spaces
+	while (it != end && *it == ' ')
+		it++;
+
+	// Skip first word (channel name)
+	while (it != end && *it != ' ')
+		it++;
+
+	// Skip spaces after channel name
+	while (it != end && *it == ' ')
+		it++;
+
+	// Optional colon before the message
+	if (it != end && *it == ':')
+		it++;
+
+	// Extract the actual message
+	std::string cleaned_message(it, end);
 	if (cleaned_message.empty())
 	{
 		LOG(ERROR "sendMessageChannel: cleaned_message is empty !")
@@ -204,7 +208,7 @@ void Server::sendMessageChannel(std::string &params, std::string &first_word, Cl
 		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);  // TODO : use numerical correctly
 		return ;
 	}
-	std::string message = ":" + sender.getPrefix() + " PRIVMSG " + channel->getName() + " :" + params + "\r\n";
+	std::string message = sender.getPrefix() + " PRIVMSG " + channel->getName() + " :" + cleaned_message + "\r\n";
 	channel->broadcast(message, sender.getFd());
 	LOG(INFO "sendMessageChannel: message sent to channel " << channel->getName())
 	return ;
