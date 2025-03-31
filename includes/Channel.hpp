@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:41:55 by hulefevr          #+#    #+#             */
 /*   Updated: 2025/03/31 19:16:21 by hulefevr         ###   ########.fr       */
@@ -48,6 +48,7 @@ public:
 	void 						addMember(Client *client);
 	void 						removeMember(int fd);
 	std::vector<std::string>	getMemberNames() const;
+
 
 	// Broadcast
 	void						broadcast(const std::string& message, int exceptFd = -1);

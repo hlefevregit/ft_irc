@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
 /*   Updated: 2025/03/31 18:49:29 by hulefevr         ###   ########.fr       */
@@ -138,6 +138,9 @@ public:
 	int										sendMessage(Client sender, std::string &params);
 	void									sendMessageUser(std::string &msg, const std::string &nickname, Client &sender);
 	void									sendNumericReply(int fd, int code, const std::string& message);
+	void									printChannelList(void);
+	void									printUsersInChannel(std::string &params);
+	
 	// void	botParse(Client sender, std::string &params);
 	// void	botHelp(Client sender);
 

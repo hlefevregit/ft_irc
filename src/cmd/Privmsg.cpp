@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Privmsg.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:50:02 by hulefevr          #+#    #+#             */
 /*   Updated: 2025/03/31 19:25:25 by hulefevr         ###   ########.fr       */
@@ -138,12 +138,12 @@ int    Server::sendMessage(Client sender, std::string &params)
 	{
 		if (channel_prefix.find(first_word[0]) != std::string::npos)
 		{
-			LOG(DEBUG "  is Channel")
+			LOG(DEBUG "is Channel")
 			sendMessageChannel(params, first_word, sender);    // TODO : dguerin implementation
 		}
 		else
 		{
-			LOG(DEBUG "  is User")
+			LOG(DEBUG "is User")
 			sendMessageUser(params, first_word, sender);   // TODO : ldalmass implementation
 		}
 	}
