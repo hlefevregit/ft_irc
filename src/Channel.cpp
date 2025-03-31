@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:45:49 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 16:08:02 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 18:26:54 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,13 @@ void Channel::removeMember(int fd)
 {
 	_members.erase(fd);
 }
-std::string Channel::getMemberNames() const
+std::vector<std::string> Channel::getMemberNames() const
 {
-	std::string names;
+	std::vector<std::string> names;
 	std::map<int, Client*>::const_iterator it;
 	for (it = _members.begin(); it != _members.end(); ++it)
 	{
-		names += it->second->getNickname() + " ";
+		names.push_back(it->second->getNickname());
 	}
 	return names;
 }
