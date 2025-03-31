@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:41:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 18:27:07 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/31 19:16:21 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,27 +38,28 @@ public:
 	~Channel();
 
 	// Accesseurs
-	const std::string&	getName() const { return _name; };
-	const std::string&	getTopic() const { return _topic; };
-	void 				setTopic(const std::string& topic) { _topic = topic; };
-	void 				setName(const std::string& name) { _name = name; };
+	const std::string&			getName() const { return _name; };
+	const std::string&			getTopic() const { return _topic; };
+	void 						setTopic(const std::string& topic) { _topic = topic; };
+	void 						setName(const std::string& name) { _name = name; };
 
 	// Membres
-	bool 				hasMember(const Client& client) const;
-	void 				addMember(Client& client);
-	void 				removeMember(int fd);
-	std::vector<std::string> 		getMemberNames() const;
+	bool 						hasMember(const Client& client) const;
+	void 						addMember(Client *client);
+	void 						removeMember(int fd);
+	std::vector<std::string>	getMemberNames() const;
+
 
 	// Broadcast
-	void				broadcast(const std::string& message, int exceptFd = -1);
+	void						broadcast(const std::string& message, int exceptFd = -1);
 
 	// Operators
-	void				addOperator(int fd);
-	bool				isOperator(int fd) const;
+	void						addOperator(int fd);
+	bool						isOperator(int fd) const;
 
-	bool				hasMode(char c) const;
-	const				std::string& getKey() const;
-	void				sendNamesReply(Client &client);
+	bool						hasMode(char c) const;
+	const						std::string& getKey() const;
+	void						sendNamesReply(Client &client);
 };
 
 #endif

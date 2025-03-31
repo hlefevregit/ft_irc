@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 15:48:25 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 19:16:29 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,6 +151,7 @@ std::string	Client::getDataSentByClientCleaned(int fd)
 void Client::joinedChannel(Channel* channel) {
 	if (std::find(_joinedChannels.begin(), _joinedChannels.end(), channel) == _joinedChannels.end())
 		_joinedChannels.push_back(channel);
+	channel->addMember(this);
 }
 
 void Client::leaveChannel(const std::string& name) {

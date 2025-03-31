@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 19:27:10 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/31 18:49:10 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 
 Server::Server(int port, const std::string &password, struct tm *timeinfo) : _password(password) {
 	_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+	_serverName = SERVER_NAME;
 	if (_serverSocket == -1)
 		throw std::runtime_error("Error: Failed to create socket");
 
@@ -61,6 +62,9 @@ void	Server::setDatetime(struct tm *timeinfo)
 }
 
 void Server::shutDownServer() {
+	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	    delete it->second;
+	_channels.clear();
 	for (std::vector<pollfd>::iterator it = _pollfds.begin(); it != _pollfds.end(); ++it) {
 		close(it->fd);
 	}
