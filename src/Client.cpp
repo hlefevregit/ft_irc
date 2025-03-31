@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 14:21:21 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 15:48:25 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,3 +148,20 @@ std::string	Client::getDataSentByClientCleaned(int fd)
 	return (cleanedMessage);
 }
 
+void Client::joinedChannel(Channel* channel) {
+	if (std::find(_joinedChannels.begin(), _joinedChannels.end(), channel) == _joinedChannels.end())
+		_joinedChannels.push_back(channel);
+}
+
+void Client::leaveChannel(const std::string& name) {
+	for (std::vector<Channel*>::iterator it = _joinedChannels.begin(); it != _joinedChannels.end(); ++it) {
+		if ((*it)->getName() == name) {
+			_joinedChannels.erase(it);
+			break;
+		}
+	}
+}
+
+const std::vector<Channel*>& Client::getJoinedChannels() const {
+	return _joinedChannels;
+}

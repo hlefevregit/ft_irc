@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/03/28 17:48:08 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/03/31 18:45:21 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 static void splitMessage(std::vector<std::string> &cmds, std::string msg)
 {
 	AUTO_LOG
-	// std::cout << INFO WALL IN << "splitMessage" << TRAIL << std::endl;
 	std::string::iterator	start = msg.begin();
 
 	while (start != msg.end())
@@ -33,8 +32,6 @@ static void splitMessage(std::vector<std::string> &cmds, std::string msg)
 			break;
 
 	}
-	
-	// std::cout << INFO WALL OUT << "splitMessage" << TRAIL << std::endl;
 	return ;
 }
 
@@ -91,7 +88,6 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					changeNickname(sender->second, cmd.params);
 				else if (cmd.command == "QUIT")
 					quitServer(sender->second, pollfds);
-				// client->resetBuffer();
 			}
 			// AUTHENTICATED USERS COMMANDS
 			else
@@ -101,8 +97,8 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					sendCapabilities(sender->second);
 				else if (cmd.command == "NICK")
 					changeNickname(sender->second, cmd.params);
-				// 	if (cmd.command == "JOIN")
-				// 		joinCommand(sender->second, cmd.params);
+				else if (cmd.command == "JOIN")
+					this->joinCommand(sender->second, cmd.params);
 				// 	else if (msg.find("INVITE") != std::string::npos)
 				// 		sender->second.inviteToChannel(msg);
 				// 	else if (msg == "LIST")
@@ -134,6 +130,11 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					std::string numerical = ERR_ALREADYREGISTRED;
 					send(client->getFd(), numerical.c_str(), numerical. size(), 0);
 				}
+				else if (cmd.command == "PRINT" && cmd.params == "list channels")
+					printChannelList();
+				else if (cmd.command == "PRINT" && cmd.params != "list channels")
+					printUsersInChannel(cmd.params);
+
 				// 	else if (msg.find("@joe") != std::string::npos || msg.find("/joe") != std::string::npos)
 				// 		botParse(sender->second, cmd.params);
 				// 		sender->second.sendMessage(sender->second, cmd.params);

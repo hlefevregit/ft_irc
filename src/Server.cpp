@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 14:20:04 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 19:27:10 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,8 @@ int Server::acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &n
 
 std::map<const int, Client> &Server::getClients() { return (_clients); }
 
-Client *getClient(Server *server, int fd) {
+Client *Server::getClient(Server *server, int fd)
+{
 	std::map<const int, Client> &clients = server->getClients();
 	std::map<const int, Client>::iterator it = clients.find(fd);
 	
@@ -337,4 +338,159 @@ void	Server::sendCapabilities(Client &sender)
 
 	return ;
 
+}
+
+/*********************************************************************/
+/*********************************************************************/
+/**************************** GET CHANNELS  **************************/
+/*********************************************************************/
+/*********************************************************************/
+
+std::map<std::string, Channel>			&Server::getChannels() { return (_channels); }
+
+/*********************************************************************/
+/*********************************************************************/
+/**************************** LIST CHANNELS **************************/
+/*********************************************************************/
+/*********************************************************************/
+
+void	Server::printChannelList(void)
+{
+	AUTO_LOG
+	t_cell_data									data;
+	unsigned short								y = 1;
+	std::map<std::string, Channel>&				channels = getChannels();
+	std::map<std::string, Channel>::iterator	end = channels.end();
+
+	addCellData(data, "Channel's name", CENTER);
+	for (std::map<std::string, Channel>::iterator start = channels.begin(); start != end; ++start)
+	{
+		addCellData(data, start->second.getName(), LEFT);
+		y++;
+	}
+	printGrid(data, 40, 1, y);
+	return ;
+}
+
+/*********************************************************************/
+/*********************************************************************/
+/*********************** LIST USERS IN A CHANNEL *********************/
+/*********************************************************************/
+/*********************************************************************/
+
+void	Server::printUsersInChannel(std::string &params)
+{
+	AUTO_LOG
+	Channel										channel;
+	std::map<std::string, Channel>&				channels = getChannels();
+	std::map<std::string, Channel>::iterator	start = channels.begin();
+	std::map<std::string, Channel>::iterator	end = channels.end();
+
+	// Parsing
+	std::string::iterator	pStart = params.begin();
+	std::string::iterator	pEnd = params.end();
+	while (pStart != pEnd)
+	{
+		if (*pStart == ' ')
+			break;
+		++pStart;
+	}
+	if (std::string(params.begin(), pStart) != "channel")
+	{
+		LOG(ERROR "Parsing error : " << params)
+		LOG(ERROR "Expecting : PRINT channel [channel name]")
+		return ;
+	}
+	LOG(DEBUG "Parsing : " << std::string(params.begin(), pStart))
+
+	// Get channel name
+	std::string	channelName;
+	if (*pStart == ' ')
+		++pStart;
+	while (pStart != pEnd)
+	{
+		if (*pStart == ' ')
+			break;
+		channelName += *pStart;
+		++pStart;
+	}
+
+	// Get asked channel
+	while (start != end)
+	{
+		if (start->second.getName() == channelName)
+		{
+			LOG(DEBUG "Found channel : " << channelName)
+			channel = start->second;
+			break;
+		}
+		++start;
+	}
+	if (start == end)
+	{
+		LOG(ERROR "Channel not found amongs all of them !")
+		return ;
+	}
+
+	// Get members names
+	std::vector<std::string>			names = channel.getMemberNames();
+
+	// Get operators members
+	unsigned short						opNbr = 0;
+	unsigned short						memberNbr = 0;
+	std::vector<std::string>			op;
+	std::vector<std::string>::iterator	opStart = names.begin();
+	std::vector<std::string>::iterator	opEnd = names.end();
+
+	while (opStart != opEnd)
+	{
+		// Get fd from a given nickname
+		std::map<const int, Client>::iterator	nick = getClientByNickname(*opStart);
+		int										fd = nick->second.getFd();
+		// Checks if the fd is operator or not
+		if (channel.isOperator(fd) == true)
+		{
+			opNbr++;
+			op.push_back("Operator");
+		}
+		else
+		{
+			memberNbr++;
+			op.push_back("Member");
+		}
+		++opStart;
+	}
+
+	// Display the  total number of members and operators
+	t_cell_data	numbers;
+	std::ostringstream oss;
+	oss << memberNbr;
+	std::string	members = oss.str();
+	oss << opNbr;
+	std::string	operators = oss.str();
+
+	addCellData(numbers, "Total members", CENTER);
+	addCellData(numbers, "Total operators", CENTER);
+	addCellData(numbers, members + operators, LEFT);
+	addCellData(numbers, operators, LEFT);
+	printGrid(numbers, 50, 2, 2);
+
+	// Display all members' names and roles
+	t_cell_data	displayMembersName;
+	unsigned short	membersCount = 0;
+	std::vector<std::string>::iterator	namesStart = names.begin();
+	std::vector<std::string>::iterator	namesEnd = names.end();
+	std::vector<std::string>::iterator	operatorStart = op.begin();
+	addCellData(displayMembersName, "Users in " + channelName, CENTER);
+	addCellData(displayMembersName, "Roles", CENTER);
+	while (namesStart != namesEnd)
+	{
+		addCellData(displayMembersName, *namesStart, LEFT);
+		addCellData(displayMembersName, *operatorStart, LEFT);
+		++namesStart;
+		++operatorStart;
+		++membersCount;
+	}
+	printGrid(displayMembersName, 50, 2, membersCount + 1);
+	return ;
 }

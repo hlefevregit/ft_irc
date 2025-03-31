@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 14:20:48 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 18:46:13 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,9 +93,6 @@ public:
 	void				 					shutDownServer();
 	void			 						setDatetime(struct tm *timeinfo);
 		
-	std::map<const int, Client>				&getClients();
-	std::map<std::string, Channel>			&getChannels();
-
 
 	/******************************************************************/
 	/******************************CLIENT******************************/
@@ -105,7 +102,11 @@ public:
 	int										readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::iterator &it);
 	void									addClient(int clientSocket, std::vector<pollfd> &pollfds);
 	void						 			deleteClient(std::vector<pollfd> &pollfds, int fd);
-		
+
+	std::map<const int, Client>				&getClients();
+	std::map<std::string, Channel>			&getChannels();
+	Client									*getClient(Server *server, int fd);
+
 		
 	/****************************************************************/
 	/******************************COMMANDS**************************/
@@ -114,9 +115,7 @@ public:
 
 	int										parseMessage(Client *client, const std::string &message, std::vector<pollfd> &pollfds);
 		
-	void									joinCommand(Client client, std::string &channelName);
-	void									addClientToChannel(Client client, const std::string &channelName);
-			
+	void									joinCommand(Client &client, const std::string &params);			
 	// void									changeNickname(Client client, std::string const &nickname);
 	// void									changeUsername(Client client, std::string const &username);
 	void									changePassword(Client client, std::string const &password);
@@ -137,14 +136,24 @@ public:
 
 	int										sendMessage(Client sender, std::string &params);
 	void									sendMessageUser(std::string &msg, const std::string &nickname, Client &sender);
+	void									sendNumericReply(int fd, int code, const std::string& message);
+	void									printChannelList(void);
+	void									printUsersInChannel(std::string &params);
 	
 	// void	botParse(Client sender, std::string &params);
 	// void	botHelp(Client sender);
 
+	/***********************************************************/
+	/******************************CHANNEL**********************/
+	/***********************************************************/
 
+	Channel*								getChannel(const std::string &name);
+	void 									sendMessageChannel(std::string &params, std::string &first_word,  Client &sender);
+
+	
 	/*********************UTILS*********************************/
 
-	std::vector<pollfd>::iterator findPollfdIterator(int fd, std::vector<pollfd> &pollfds);
+	std::vector<pollfd>::iterator 			findPollfdIterator(int fd, std::vector<pollfd> &pollfds);
 };
 
 void 										sendChillguy(int clientSocket);
