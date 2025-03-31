@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:50 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 19:16:29 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 22:13:36 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Client.hpp"
 #include "../includes/Server.hpp"
 
-Client::Client(int socket) : _socket(socket), _authentificated(false), _hasUsername(false), _hasNickname(false), _nickname(""), _username(""), _readBuf("") {}
+Client::Client(int socket) : _socket(socket), _authentificated(false), _hasUsername(false), _hasNickname(false), _hasPassword(false), _nickname(""), _username(""), _readBuf(""), _password("") {}
 
 Client::Client(const Client &src) {
 	*this = src;

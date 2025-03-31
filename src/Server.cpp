@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 18:49:10 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 22:26:14 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ void Server::shutDownServer() {
 
 void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds)
 {
+	AUTO_LOG
 	Client		newClient(clientSocket);
 	std::string	message;
 
@@ -83,7 +84,7 @@ void Server::addClient(int clientSocket, std::vector<pollfd> &pollfds)
 	pfd.events = POLLIN;
 
 	/* Add new client to std::map<const int, Client> */
-	std::cout << INFO << "New unregistered client added #" << clientSocket << std::endl;
+	LOG(INFO "New unregistered client added #" << clientSocket)
 	_clients.insert(std::pair<int, Client>(clientSocket, newClient));
 	pollfds.push_back(pfd);
 
@@ -254,17 +255,14 @@ void Server::run() {
 void	Server::authenticateClient(Client &sender)
 {
 	AUTO_LOG
+	LOG("sender nickname : " << sender.hasNickname())
+	LOG("sender username : " << sender.hasUsername())
+	LOG("sender password : " << sender.hasPassword())
 	if (sender.hasNickname() && sender.hasUsername() && sender.hasPassword())
 	{
 		std::string	msg = RPL_WELCOME(sender.getNickname());
 		send(sender.getFd(), msg.c_str(), msg.size(), 0);
 		sendChad(sender.getFd());
-		// msg = RPL_YOURHOST(SERVER_NAME);
-		// send(sender.getFd(), msg.c_str(), msg.size(), 0);
-		// msg = RPL_CREATED();
-		// send(sender.getFd(), msg.c_str(), msg.size(), 0);
-		// msg = RPL_MYINFO();
-		// send(sender.getFd(), msg.c_str(), msg.size(), 0);
 		sender.authenticate();
 	}
 	if (sender.isAuthenticated() == true)
@@ -350,7 +348,7 @@ void	Server::sendCapabilities(Client &sender)
 /*********************************************************************/
 /*********************************************************************/
 
-std::map<std::string, Channel>			&Server::getChannels() { return (_channels); }
+std::map<std::string, Channel*>	&Server::getChannels() { return (_channels); }
 
 /*********************************************************************/
 /*********************************************************************/
@@ -363,13 +361,13 @@ void	Server::printChannelList(void)
 	AUTO_LOG
 	t_cell_data									data;
 	unsigned short								y = 1;
-	std::map<std::string, Channel>&				channels = getChannels();
-	std::map<std::string, Channel>::iterator	end = channels.end();
+	std::map<std::string, Channel*>&			channels = getChannels();
+	std::map<std::string, Channel*>::iterator	end = channels.end();
 
 	addCellData(data, "Channel's name", CENTER);
-	for (std::map<std::string, Channel>::iterator start = channels.begin(); start != end; ++start)
+	for (std::map<std::string, Channel*>::iterator start = channels.begin(); start != end; ++start)
 	{
-		addCellData(data, start->second.getName(), LEFT);
+		addCellData(data, start->second->getName(), LEFT);
 		y++;
 	}
 	printGrid(data, 40, 1, y);
@@ -386,9 +384,9 @@ void	Server::printUsersInChannel(std::string &params)
 {
 	AUTO_LOG
 	Channel										channel;
-	std::map<std::string, Channel>&				channels = getChannels();
-	std::map<std::string, Channel>::iterator	start = channels.begin();
-	std::map<std::string, Channel>::iterator	end = channels.end();
+	std::map<std::string, Channel*>&			channels = getChannels();
+	std::map<std::string, Channel*>::iterator	start = channels.begin();
+	std::map<std::string, Channel*>::iterator	end = channels.end();
 
 	// Parsing
 	std::string::iterator	pStart = params.begin();
@@ -422,10 +420,10 @@ void	Server::printUsersInChannel(std::string &params)
 	// Get asked channel
 	while (start != end)
 	{
-		if (start->second.getName() == channelName)
+		if ((*start).second->getName() == channelName)
 		{
 			LOG(DEBUG "Found channel : " << channelName)
-			channel = start->second;
+			channel = *(*start).second; // Dereference the pointer before assigning it to channel
 			break;
 		}
 		++start;
@@ -470,8 +468,9 @@ void	Server::printUsersInChannel(std::string &params)
 	std::ostringstream oss;
 	oss << memberNbr;
 	std::string	members = oss.str();
-	oss << opNbr;
-	std::string	operators = oss.str();
+	std::ostringstream osss;
+	osss << opNbr;
+	std::string	operators = osss.str();
 
 	addCellData(numbers, "Total members", CENTER);
 	addCellData(numbers, "Total operators", CENTER);

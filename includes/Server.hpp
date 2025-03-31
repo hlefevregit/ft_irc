@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 18:49:29 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 22:02:11 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ public:
 	void						 			deleteClient(std::vector<pollfd> &pollfds, int fd);
 
 	std::map<const int, Client>				&getClients();
-	std::map<std::string, Channel>			&getChannels();
+	std::map<std::string, Channel*>			&getChannels();
 	Client									*getClient(Server *server, int fd);
 
 		

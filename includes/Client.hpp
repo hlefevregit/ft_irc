@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:58 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 15:48:31 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 22:13:17 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ public:
 	bool			isAuthenticated() const;
 	void			authenticate();
 	
-	void			setNickname(const std::string &nickname) { _nickname = nickname; _hasNickname = true; };
 	void			setUsername(const std::string &username) { _username = username; _hasUsername = true; };
+	void			setNickname(const std::string &nickname) { _nickname = nickname; _hasNickname = true; };
 	void			setPassword(const std::string &password) { _password = password; _hasPassword = true; };
 	void			setReadBuffer(std::string const &buf);
 	
@@ -56,7 +56,7 @@ public:
 
 	bool			hasUsername() const { return _hasUsername; };
 	bool			hasNickname() const { return _hasNickname; };
-	bool			hasPassword() const { return _hasNickname; };
+	bool			hasPassword() const { return _hasPassword; };
 	
 	int				authentification(Client *client);
 	
