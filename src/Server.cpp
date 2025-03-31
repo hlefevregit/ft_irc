@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 14:20:04 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 15:37:28 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,8 @@ int Server::acceptNewClient(std::vector<pollfd> &pollfds, std::vector<pollfd> &n
 
 std::map<const int, Client> &Server::getClients() { return (_clients); }
 
-Client *getClient(Server *server, int fd) {
+Client *Server::getClient(Server *server, int fd)
+{
 	std::map<const int, Client> &clients = server->getClients();
 	std::map<const int, Client>::iterator it = clients.find(fd);
 	

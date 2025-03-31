@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:05:58 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/28 11:45:26 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 15:48:31 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,18 +16,23 @@
 #include <string>
 #include <vector>
 #include "Server.hpp"
+#include "Channel.hpp"
+
+class Channel;
 
 class Client {
 private:
-	int			_socket;
-	bool		_authentificated;
-	bool		_hasUsername;
-	bool		_hasNickname;
-	bool		_hasPassword;
-	std::string _nickname;
-	std::string	_username;
-	std::string _readBuf;
-	std::string _password;
+	int						_socket;
+	bool					_authentificated;
+	bool					_hasUsername;
+	bool					_hasNickname;
+	bool					_hasPassword;
+	std::string 			_nickname;
+	std::string				_username;
+	std::string 			_readBuf;
+	std::string 			_password;
+
+	std::vector<Channel*>	_joinedChannels;
 	
 public:
 	Client(int socket);
@@ -63,6 +68,10 @@ public:
 
 	int				getFd() const { return _socket; };
 
+	void 			joinedChannel(Channel* channel);
+	void 			leaveChannel(const std::string& channelName);
+	const 			std::vector<Channel*>& getJoinedChannels() const;
+
 	/**********************************/
 	/*************COMMANDS*************/
 	/**********************************/
@@ -71,6 +80,12 @@ public:
 	void 			changeUsername(std::string const &username);
 	void 			changePassword(std::string const &password);
 
+	/**********************************/
+	
+	std::string 	getPrefix() const {
+		return ":" + _nickname + "!" + _username + "@" + "localhost";
+	}
+	
 	// ldalmass
 	std::string		getDataSentByClientCleaned(int fd);
 };

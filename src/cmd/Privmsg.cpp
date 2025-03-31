@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:50:02 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/28 19:13:20 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/03/31 16:35:51 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ int    Server::sendMessage(Client sender, std::string &params)
 		if (channel_prefix.find(first_word[0]) != std::string::npos)
 		{
 			LOG(DEBUG "  is Channel")
-			// sendMessageChannel();    // TODO : dguerin implementation
+			sendMessageChannel(params, first_word, sender);    // TODO : dguerin implementation
 		}
 		else
 		{
@@ -149,4 +149,64 @@ int    Server::sendMessage(Client sender, std::string &params)
 	}
 
 	return 0;
+}
+/*********************************************************************/
+/*********************************************************************/
+/************************    CHANNEL PART    *************************/
+/*********************************************************************/
+/*********************************************************************/
+
+
+void Server::sendMessageChannel(std::string &params, std::string &first_word, Client &sender)
+{
+	AUTO_LOG
+	Channel *channel = getChannel(first_word);
+	if (!channel)
+	{
+		LOG(ERROR "sendMessageChannel: channel not found !")
+		std::string numerical = ERR_NOSUCHCHANNEL(params);
+		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
+		return ;
+	}
+	if (!channel->hasMember(sender))
+	{
+		LOG(ERROR "sendMessageChannel: client not in channel !")
+		std::string numerical = ERR_NOTONCHANNEL(channel->getName());
+		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
+		return ;
+	}
+	
+
+	/***********************************/
+	/* Remove the targeted user in msg */
+	/***********************************/
+	std::string::iterator	start = params.begin();
+	std::string::iterator	end = params.end();
+
+	// Skips spaces
+	while (start != end && *start == ' ')
+		++start;
+	// Skips first word
+	while (start != end && *start != ' ')
+		++start;
+	// Skips spaces
+	while (start != end && *start == ' ')
+		++start;
+	// Skips the semicolon ':' if needed
+	if (start != end && *start == ':')
+		++start;
+	// Reform message
+	std::string	cleaned_message(start, end);
+	if (cleaned_message.empty())
+	{
+		LOG(ERROR "sendMessageChannel: cleaned_message is empty !")
+		std::string numerical = std::string("461 ") + "PRIVMSG :Not enough parameters";
+		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);  // TODO : use numerical correctly
+		return ;
+	}
+	std::string message = ":" + sender.getPrefix() + " PRIVMSG " + channel->getName() + " :" + params + "\r\n";
+	channel->broadcast(message, sender.getFd());
+	LOG(INFO "sendMessageChannel: message sent to channel " << channel->getName())
+	return ;
+	
 }
