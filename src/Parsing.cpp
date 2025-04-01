@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/04/01 18:38:41 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/01 20:23:10 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,19 +99,19 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					changeNickname(sender->second, cmd.params);
 				else if (cmd.command == "JOIN")
 					this->joinCommand(sender->second, cmd.params);
-				// 	else if (msg.find("INVITE") != std::string::npos)
+				// 	else if (cmd.command == "INVITE")
 				// 		sender->second.inviteToChannel(msg);
-				// 	else if (msg == "LIST")
+				// 	else if (cmd.command == "LIST")
 				// 		sender->second.listChannels();
-				// 	else if (msg.find("KICK") != std::string::npos)
+				// 	else if (cmd.command == "KICK")
 				// 		sender->second.kickFromChannel(msg);
-				// 	else if (msg.find("MODE") != std::string::npos)
+				// 	else if (cmd.command == "MODE")
 				// 		sender->second.changeMode(msg);
-				else if (msg.find("TOPIC") != std::string::npos)
+				else if (cmd.command == "TOPIC")
 					changeTopic(sender->second, cmd.params);
-				// 	else if (msg.find("PART") != std::string::npos)
+				// 	else if (cmd.command == "PART")
 				// 		sender->second.leaveChannel(msg);
-				// 	else if (msg.find("PING") != std::string::npos)
+				// 	else if (cmd.command == "PING")
 				// 		sender->second.ping(msg);
 				else if (cmd.command == "PRIVMSG")
 				{
@@ -130,6 +130,7 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					std::string numerical = ERR_ALREADYREGISTRED;
 					send(client->getFd(), numerical.c_str(), numerical. size(), 0);
 				}
+				// Commandes de test pour le futur bot
 				else if (cmd.command == "PRINT" && cmd.params == "list channels")
 					printChannelList();
 				else if (cmd.command == "PRINT" && cmd.params != "list channels")

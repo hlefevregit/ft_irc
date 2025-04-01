@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/01 16:52:42 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/01 20:24:21 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,9 +255,6 @@ void Server::run() {
 void	Server::authenticateClient(Client &sender)
 {
 	AUTO_LOG
-	// LOG("sender nickname : " << sender.hasNickname())
-	// LOG("sender username : " << sender.hasUsername())
-	// LOG("sender password : " << sender.hasPassword())
 	if (sender.hasNickname() && sender.hasUsername() && sender.hasPassword())
 	{
 		std::string	msg = RPL_WELCOME(sender.getNickname());

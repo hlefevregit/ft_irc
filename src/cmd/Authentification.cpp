@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:47:25 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/28 17:35:23 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/01 20:21:22 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ void	Server::connectToServerWithPass(Client &sender, std::string &params)
 {
 	AUTO_LOG
 	// Get PASS
-	// std::string::iterator	start = (params.begin() + params.find("PASS") + 5);
 	std::string::iterator	start = params.begin();
 	std::string				pass = std::string(start, params.end());
 
