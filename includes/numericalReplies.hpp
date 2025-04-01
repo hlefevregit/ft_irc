@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/28 16:04:42 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/01 19:47:40 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,15 @@
 
 /*---------------JOIN-------------------*/
 
+void    sendToUserErr403(int fd, const char *channel);
 #define ERR_BADCHANNELKEY(channel) "475 " + channel + " :Cannot join channel (+k)\n"
 #define ERR_CHANNELISFULL(channel) "471 " + channel + " :Cannot join channel (+l)\n"
 #define ERR_INVITEONLYCHAN(channel)	"473 " + channel + " :Cannot join channel (+i)\n"
 #define ERR_BANNEDFROMCHAN(channel) "474 " + channel + " :Cannot join channel (+b)\n"
 #define ERR_NOSUCHCHANNEL(channel) "403 " + channel + " :No such channel\n"
-void    sendToUserErr403(int fd, const char *channel);
 #define ERR_TOOMANYCHANNELS(channel) "405 " + channel + " :You have joined too many channels\n"
 #define ERR_TOOMANYTARGETS(target, errorCode, abortMessage) "407 " + target + " :" + errorCode + "Too many recipients. " + abortMessage + "\n"
 #define ERR_UNAVAILRESOURCE(nick, channel) "437 " + nick + " " + channel + " :Nick/channel is temporarily unavailable\n"
-#define RPL_TOPIC(channel, topic) "332 " + channel + " :" topic + "\n"
 #define ERR_BADCHANMASK(channel) "476 " + channel + " :Bad Channel Mask\n"
 
 /*---------------KICK-------------------*/
@@ -87,6 +86,8 @@ void    sendToUserErr403(int fd, const char *channel);
 /*---------------TOPIC-------------------*/
 
 #define RPL_NOTOPIC(channel) "331 " + channel + " :No topic is set\n"
+#define RPL_TOPIC(user, channel, topic) "332 " + user + " " + channel + " :" + topic + "\r\n"
+#define RPL_TOPIC_BROADCAST(user, channel, topic) ":" + user + " TOPIC " + channel + " :" + topic + "\r\n"
 
 #define ERR_UNKNOWNCOMMAND(cmd) "421 " + cmd + " :Unknown command\n"
 void    sendToUserErr421(int fd, const char *cmd);

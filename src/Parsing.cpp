@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/03/31 18:45:21 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/01 18:38:41 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,8 +107,8 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 				// 		sender->second.kickFromChannel(msg);
 				// 	else if (msg.find("MODE") != std::string::npos)
 				// 		sender->second.changeMode(msg);
-				// 	else if (msg.find("TOPIC") != std::string::npos)
-				// 		sender->second.changeTopic(msg);
+				else if (msg.find("TOPIC") != std::string::npos)
+					changeTopic(sender->second, cmd.params);
 				// 	else if (msg.find("PART") != std::string::npos)
 				// 		sender->second.leaveChannel(msg);
 				// 	else if (msg.find("PING") != std::string::npos)

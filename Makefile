@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+         #
+#    By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/23 13:36:33 by hulefevr          #+#    #+#              #
-#    Updated: 2025/03/31 14:22:13 by hulefevr         ###   ########.fr        #
+#    Updated: 2025/04/01 18:39:30 by ldalmass         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,7 @@ SRC		=	main.cpp \
 			./src/Bot.cpp \
 			./src/Log.cpp \
 			./src/printMessage.cpp \
+			./src/cmd/Topic.cpp \
 
 NAME	=	ircserv
 
