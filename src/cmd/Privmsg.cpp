@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:50:02 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 19:25:25 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/01 20:55:45 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,7 @@ void Server::sendMessageChannel(std::string &params, std::string &first_word, Cl
 	if (!channel)
 	{
 		LOG(ERROR "sendMessageChannel: channel not found !")
-		std::string numerical = ERR_NOSUCHCHANNEL(params);
+		std::string numerical = ERR_NOSUCHCHANNEL(std::string(SERVER_NAME), sender.getNickname(), first_word);
 		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
 		return ;
 	}

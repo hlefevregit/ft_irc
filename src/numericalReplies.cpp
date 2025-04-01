@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   numericalReplies.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 11:27:39 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 15:52:15 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/01 20:58:39 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,6 @@
 
 void    sendToUserErr421(int fd, const char *cmd) {
     std::string msg = ERR_UNKNOWNCOMMAND(std::string(cmd));
-    send(fd, msg.c_str(), msg.size(), 0);
-}
-
-void    sendToUserErr403(int fd, const char *channel) {
-    std::string msg = ERR_NOSUCHCHANNEL(std::string(channel));
     send(fd, msg.c_str(), msg.size(), 0);
 }
 

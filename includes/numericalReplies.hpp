@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/01 19:47:40 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/01 20:58:34 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,11 @@
 
 /*---------------JOIN-------------------*/
 
-void    sendToUserErr403(int fd, const char *channel);
 #define ERR_BADCHANNELKEY(channel) "475 " + channel + " :Cannot join channel (+k)\n"
 #define ERR_CHANNELISFULL(channel) "471 " + channel + " :Cannot join channel (+l)\n"
 #define ERR_INVITEONLYCHAN(channel)	"473 " + channel + " :Cannot join channel (+i)\n"
 #define ERR_BANNEDFROMCHAN(channel) "474 " + channel + " :Cannot join channel (+b)\n"
-#define ERR_NOSUCHCHANNEL(channel) "403 " + channel + " :No such channel\n"
+#define ERR_NOSUCHCHANNEL(server, user, channel) ":" + server + " 403 " + user + " " + channel + " :No such channel\r\n"
 #define ERR_TOOMANYCHANNELS(channel) "405 " + channel + " :You have joined too many channels\n"
 #define ERR_TOOMANYTARGETS(target, errorCode, abortMessage) "407 " + target + " :" + errorCode + "Too many recipients. " + abortMessage + "\n"
 #define ERR_UNAVAILRESOURCE(nick, channel) "437 " + nick + " " + channel + " :Nick/channel is temporarily unavailable\n"

@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 17:19:42 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/04/01 19:55:19 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/01 20:56:06 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ void	Server::changeTopic(Client &sender, std::string &params)
 	if (extractedChannelName.empty())
 	{
 		LOG(ERROR "No channels we're provided with the TOPIC command ❌")
+		std::string	numerical = ERR_NOSUCHCHANNEL(std::string(SERVER_NAME), sender.getNickname(), extractedChannelName);
+		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
 		return ;
 	}
 
@@ -57,6 +59,8 @@ void	Server::changeTopic(Client &sender, std::string &params)
 	if (channelsStart == channelsEnd)
 	{
 		LOG(ERROR "Channel not found ❌")
+		std::string	numerical = ERR_NOSUCHCHANNEL(std::string(SERVER_NAME), sender.getNickname(), extractedChannelName);
+		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
 		return ;
 	}
 	LOG(DEBUG "Channel found ✅")
