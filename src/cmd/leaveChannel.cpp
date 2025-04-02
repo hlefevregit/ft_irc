@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 14:27:23 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/04/02 17:09:16 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/02 18:27:18 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 static std::vector<std::string>	splitByDelimiter(std::string input, char delimiter)
 {
-	AUTO_LOG
-
 	std::vector<std::string>	result;
 	std::string::iterator		inputStart = input.begin();
 	std::string::iterator		inputEnd = input.end();
@@ -33,20 +31,6 @@ static std::vector<std::string>	splitByDelimiter(std::string input, char delimit
 		++inputStart;
 	}
 	result.push_back(line);
-
-	// Debug
-	unsigned short						i = 0;
-	std::vector<std::string>::iterator	start = result.begin();
-	std::vector<std::string>::iterator	end = result.end();
-
-	LOG(DEBUG "split size : " << result.size())
-	while (start != end)
-	{
-		LOG(DEBUG "[" << i <<  "] " "splitted : " << *start)
-		++start;
-		++i;
-	}
-	return (result);
 }
 
 void	Server::leaveChannel(Client &sender, std::string &params)

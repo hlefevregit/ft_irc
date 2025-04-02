@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/02 16:18:32 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/02 18:26:34 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,3 @@
 
 #define ERR_UNKNOWNCOMMAND(cmd) "421 " + cmd + " :Unknown command\n"
 void    sendToUserErr421(int fd, const char *cmd);
-
-/*---------------PART-------------------*/
-
