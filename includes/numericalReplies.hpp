@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/01 20:58:34 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/02 16:18:32 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@
 #define ERR_CHANOPRIVSNEEDED(channel) "482 " + channel + " :You're not channel operator\n"
 #define ERR_USERNOTINCHANNEL(nick, channel) "441 " + nick + " " + channel + " :They aren't on that channel\n"
 
-
 /*---------------MODE-------------------*/
 
 #define ERR_KEYSET(channel) "467 " + channel + " :Channel key already set\n"
@@ -75,7 +74,7 @@
 #define ERR_WRONGPASSWORD(server) ":" server " 464 :Password incorrect\n"
 #define ERR_ALREADYREGISTRED "462 :Unauthorized command (already registered)\n"
 
-/*---------------PRIVMSG-------------------*/
+/*---------------PRIVMSG-----------------*/
 #define ERR_NORECIPIENT(cmd) "411 " + cmd + " :No recipient given\n"
 #define ERR_NOTEXTTOSEND "412 :No text to send"
 #define ERR_NOTOPLEVEL(mask) "413 " + mask + " :No toplevel domain specified\n"
@@ -91,5 +90,5 @@
 #define ERR_UNKNOWNCOMMAND(cmd) "421 " + cmd + " :Unknown command\n"
 void    sendToUserErr421(int fd, const char *cmd);
 
-
+/*---------------PART-------------------*/
 

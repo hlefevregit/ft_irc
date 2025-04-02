@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/04/01 20:23:10 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/02 14:25:48 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,8 +109,8 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 				// 		sender->second.changeMode(msg);
 				else if (cmd.command == "TOPIC")
 					changeTopic(sender->second, cmd.params);
-				// 	else if (cmd.command == "PART")
-				// 		sender->second.leaveChannel(msg);
+				else if (cmd.command == "PART")
+					leaveChannel(sender->second, cmd.params);
 				// 	else if (cmd.command == "PING")
 				// 		sender->second.ping(msg);
 				else if (cmd.command == "PRIVMSG")

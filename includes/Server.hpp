@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/01 18:38:52 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/02 14:27:05 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,7 @@ public:
 	void									printChannelList(void);
 	void									printUsersInChannel(std::string &params);
 	void									changeTopic(Client &sender, std::string &params);
+	void									leaveChannel(Client &sender, std::string &params);
 	
 	// void	botParse(Client sender, std::string &params);
 	// void	botHelp(Client sender);

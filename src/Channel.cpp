@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:45:49 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 19:16:52 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/02 15:10:10 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,11 @@ Channel::Channel(const std::string& name, const Client& creator) : _name(name) {
 bool Channel::hasMember(const Client& client) const
 {
 	return _members.find(client.getFd()) != _members.end();
+}
+
+bool Channel::hasMember(const int &fd) const
+{
+	return _members.find(fd) != _members.end();
 }
 
 void Channel::addMember(Client *client)

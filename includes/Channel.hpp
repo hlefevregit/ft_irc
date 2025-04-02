@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:41:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 19:16:21 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/02 15:10:20 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ public:
 
 	// Membres
 	bool 						hasMember(const Client& client) const;
+	bool 						hasMember(const int &fd) const;
 	void 						addMember(Client *client);
 	void 						removeMember(int fd);
 	std::vector<std::string>	getMemberNames() const;
