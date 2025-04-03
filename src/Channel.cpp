@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:45:49 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/02 15:10:10 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/03 19:19:38 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,14 +79,28 @@ bool Channel::isOperator(int fd) const
 	return _operators.find(fd) != _operators.end();
 }
 
-bool Channel::hasMode(char c) const {
+bool Channel::hasMode(char c) const 
+{
 	return _modes.find(c) != _modes.end();
 }
 
-const std::string& Channel::getKey() const {
+const std::string& Channel::getKey() const 
+{
 	return _key;
 }
 
+bool Channel::isOperator(const Client& client) const 
+{
+	return _operators.find(client.getFd()) != _operators.end();
+}
+
+void Channel::sendNumericReply(int fd, int code, const std::string& message) const 
+{
+	std::stringstream ss;
+	ss << code;
+	std::string reply = ":" + _name + " " + ss.str() + " " + message + "\r\n";
+	send(fd, reply.c_str(), reply.size(), 0);
+}
 
 // Envoie :353 & 366
 void Channel::sendNamesReply(Client &client) {
@@ -103,6 +117,18 @@ void Channel::sendNamesReply(Client &client) {
 	send(client.getFd(), msg.c_str(), msg.size(), 0);
 	
 }
+
+bool Channel::isInvited(const Client &client) const {
+	return _invitedNicknames.find(client.getNickname()) != _invitedNicknames.end();
+}
+
+void Channel::inviteClient(const Client &client) {
+	_invitedNicknames.insert(client.getNickname());
+}
+
+// Channel.cpp
+
+
 
 /*********************************************************************/
 /*********************************************************************/

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/03 17:47:51 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/03 19:02:36 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,7 @@ public:
 	void									kickFromChannel(Client &sender, std::string &params);
 	std::vector<std::string>				splitByDelimiter(std::string input, char delimiter);
 	
+	void									modeCommand(Client &client, const std::string &params);
 	// void	botParse(Client sender, std::string &params);
 	// void	botHelp(Client sender);
 

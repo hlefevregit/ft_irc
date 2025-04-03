@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:41:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/02 15:10:20 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/03 19:16:48 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,9 @@ private:
 	std::set<int>			_operators;
 	std::string				_key;
 	std::set<char>			_modes;
+	std::set<std::string>	_invitedNicknames;
+	
+	int						_userLimit;
 
 public:
 	Channel();
@@ -52,15 +55,24 @@ public:
 
 
 	// Broadcast
+	void						broadcastModeChange(const Client& setter, char mode, bool enable, const std::string& arg = "");
 	void						broadcast(const std::string& message, int exceptFd = -1);
-
+	void						sendNumericReply(int fd, int code, const std::string& message) const;
 	// Operators
 	void						addOperator(int fd);
 	bool						isOperator(int fd) const;
+	bool						isOperator(const Client &client) const;
 
 	bool						hasMode(char c) const;
 	const						std::string& getKey() const;
 	void						sendNamesReply(Client &client);
+
+	// Invites
+	bool						isInvited(const Client &client) const;
+	void						inviteClient(const Client &client);
+
+	void						setMode(char mode, bool emable, const Client &client, const std::string &arg = "");
+	std::string					getModes() const;
 };
 
 #endif
