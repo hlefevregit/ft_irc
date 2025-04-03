@@ -6,7 +6,7 @@
 #    By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/23 13:36:33 by hulefevr          #+#    #+#              #
-#    Updated: 2025/04/02 15:05:43 by ldalmass         ###   ########.fr        #
+#    Updated: 2025/04/03 18:48:12 by ldalmass         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,7 @@ SRC		=	main.cpp \
 			./src/printMessage.cpp \
 			./src/cmd/Topic.cpp \
 			./src/cmd/leaveChannel.cpp \
+			./src/cmd/kickFromChannel.cpp \
 
 NAME	=	ircserv
 

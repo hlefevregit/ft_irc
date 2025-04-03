@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/04/02 14:25:48 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/03 18:47:16 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,8 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 				// 		sender->second.inviteToChannel(msg);
 				// 	else if (cmd.command == "LIST")
 				// 		sender->second.listChannels();
-				// 	else if (cmd.command == "KICK")
-				// 		sender->second.kickFromChannel(msg);
+				else if (cmd.command == "KICK")
+					kickFromChannel(sender->second, cmd.params);
 				// 	else if (cmd.command == "MODE")
 				// 		sender->second.changeMode(msg);
 				else if (cmd.command == "TOPIC")

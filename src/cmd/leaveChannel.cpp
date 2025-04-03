@@ -6,32 +6,11 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 14:27:23 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/04/02 18:27:18 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/03 17:47:57 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Server.hpp"
-
-static std::vector<std::string>	splitByDelimiter(std::string input, char delimiter)
-{
-	std::vector<std::string>	result;
-	std::string::iterator		inputStart = input.begin();
-	std::string::iterator		inputEnd = input.end();
-	std::string					line = "";
-
-	while (inputStart != inputEnd)
-	{
-		if (*inputStart == delimiter)
-		{
-			result.push_back(line);
-			line = "";
-		}
-		else
-			line += *inputStart;
-		++inputStart;
-	}
-	result.push_back(line);
-}
 
 void	Server::leaveChannel(Client &sender, std::string &params)
 {

@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:50:02 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/01 20:55:45 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/03 18:05:44 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,24 +19,7 @@
 /*********************************************************************/
 /*********************************************************************/
 
-std::map<const int, Client>::iterator	Server::getClientByNickname(const std::string &nickname)
-{
-	AUTO_LOG
-	std::map<const int, Client>::iterator	start = _clients.begin();
-	std::map<const int, Client>::iterator	end = _clients.end();
 
-	// Check if nickname correspond to a Client's nickname
-	while (start != end)
-	{
-		if (start->second.getNickname() == nickname)
-			return (start);
-		++start;
-	}
-	// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-	// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
-	LOG(ERROR "getClientByNickname: nickname not found amongs clients !")
-	return (start);
-}
 
 void	Server::sendMessageUser(std::string &msg, const std::string &nickname, Client &sender)
 {
