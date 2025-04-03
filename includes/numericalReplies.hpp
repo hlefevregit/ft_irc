@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/02 18:26:34 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/03 18:51:02 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,9 @@
 #define RPL_NOTOPIC(channel) "331 " + channel + " :No topic is set\n"
 #define RPL_TOPIC(user, channel, topic) "332 " + user + " " + channel + " :" + topic + "\r\n"
 #define RPL_TOPIC_BROADCAST(user, channel, topic) ":" + user + " TOPIC " + channel + " :" + topic + "\r\n"
+
+/*---------------KICK--------------------*/
+#define RPL_KICK_SUCCESS(server, channel, victim, reason) ":" + server + " KICK " + channel + " " + victim + " :" + reason + "\r\n"
 
 #define ERR_UNKNOWNCOMMAND(cmd) "421 " + cmd + " :Unknown command\n"
 void    sendToUserErr421(int fd, const char *cmd);

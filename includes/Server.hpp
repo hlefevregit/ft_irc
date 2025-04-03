@@ -142,6 +142,8 @@ public:
 	void									printUsersInChannel(std::string &params);
 	void									changeTopic(Client &sender, std::string &params);
 	void									leaveChannel(Client &sender, std::string &params);
+	void									kickFromChannel(Client &sender, std::string &params);
+	std::vector<std::string>				splitByDelimiter(std::string input, char delimiter);
 	
 	void									modeCommand(Client &client, const std::string &params);
 	// void	botParse(Client sender, std::string &params);

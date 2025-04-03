@@ -33,6 +33,7 @@ SRC		=	main.cpp \
 			./src/cmd/Topic.cpp \
 			./src/cmd/leaveChannel.cpp \
 			./src/cmd/Mode.cpp \
+			./src/cmd/kickFromChannel.cpp \
 
 NAME	=	ircserv
 
