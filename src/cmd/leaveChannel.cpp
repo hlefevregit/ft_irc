@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   leaveChannel.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 14:27:23 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/04/02 18:27:18 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/03 19:21:07 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ static std::vector<std::string>	splitByDelimiter(std::string input, char delimit
 		++inputStart;
 	}
 	result.push_back(line);
+	return (result);
 }
 
 void	Server::leaveChannel(Client &sender, std::string &params)

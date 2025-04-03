@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 10:52:09 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/03/31 18:57:52 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/03 19:48:55 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,18 @@ void Server::joinCommand(Client &client, const std::string &params)
 			// Création canal si inexistant
 			channel = new Channel(chanName, client);
 			_channels[chanName] = channel;
-			LOG(INFO "Channel " << chanName << " created")
+			channel->addOperator(client.getFd());
+			LOG(INFO "Channel " << chanName << " created with client " << client.getNickname() << " as operator")
 		} else {
 			// Vérif +k
 			if (channel->hasMode('k') && channel->getKey() != key) {
 				sendNumericReply(client.getFd(), 475, chanName);
 				LOG(INFO "Client " << client.getNickname() << " failed to join channel " << chanName << " (wrong key)")
+				continue;
+			}
+			if (channel->hasMode('i') && !channel->isInvited(client)) {
+				sendNumericReply(client.getFd(), 473, chanName);  // ERR_INVITEONLYCHAN
+				LOG(INFO "Client " << client.getNickname() << " cannot join invite-only channel " << chanName)
 				continue;
 			}
 		}
@@ -66,6 +72,12 @@ void Server::joinCommand(Client &client, const std::string &params)
 			client.joinedChannel(channel);
 		// RPL_NAMREPLY + RPL_ENDOFNAMES
 		sendJoinReplies(client, *channel);
+		
+		
+		std::string modes = channel->getModes();  // ex: "+ik"
+		std::string modeLine = ":ircserv 324 " + client.getNickname() + " " + chanName + " " + modes + "\r\n";
+		send(client.getFd(), modeLine.c_str(), modeLine.length(), 0);
+
 		LOG(INFO "Client " << client.getNickname() << " joined channel " << chanName)
 	}
 }
