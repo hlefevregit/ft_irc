@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Topic.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 17:19:42 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/04/04 12:13:00 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 14:59:33 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,7 @@ void	Server::changeTopic(Client &sender, std::string &params)
 		++paramsStart;
 	}
 
+	// Check if user is operator
 	if (channel->hasMode('t'))
 	{
 		if (!channel->isOperator(sender.getFd()))

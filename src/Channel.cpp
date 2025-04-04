@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:45:49 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 13:42:39 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 15:20:23 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void Channel::broadcast(const std::string& message, int exceptFd)
 	{
 		if (it->second->getFd() != exceptFd)
 		{
-			LOG(DEBUG "Sending message to client " << it->second->getFd())
+			LOG(DEBUG "Sending message: " << message << " to client: " << it->second->getFd())
 			send(it->second->getFd(), message.c_str(), message.size(), 0);
 		}
 	}

@@ -87,18 +87,19 @@ void	Server::leaveChannel(Client &sender, std::string &params)
 
 	while (selectedChannelsStart != selectedChannelsEnd)
 	{
+		LOG(DEBUG "Leaving channel : " << *selectedChannelsStart)
 		Channel *	selectedChannel = getChannel(*selectedChannelsStart);
 		if (leaveBroadcast.empty())	// Case there is no leave message
 		{
-			std::string	numerical = ":" + sender.getNickname() + " " + selectedChannel->getName() + " :has left" ;
-			send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
-			selectedChannel->broadcast(numerical, sender.getFd());	// Use default leave message
+			LOG(INFO "CASE default")
+			std::string	numerical = sender.getPrefix() + " PART " + selectedChannel->getName() + " :has left" ;
+			selectedChannel->broadcast(numerical);	// Use default leave message
 		}
 		else						// Case there is a leave message
 		{
-			std::string	numerical = ":" + sender.getNickname() + " " + selectedChannel->getName() + " :" + leaveBroadcast;
-			send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
-			selectedChannel->broadcast(numerical, sender.getFd());	// Use optional leave message
+			LOG(INFO "CASE custom leaving message")
+			std::string	numerical = sender.getPrefix() + " PART " + selectedChannel->getName() + " :" + leaveBroadcast;
+			selectedChannel->broadcast(numerical);	// Use optional leave message
 		}
 		LOG(INFO "User " << sender.getNickname() << " leaved " << selectedChannel->getName())
 		selectedChannel->removeMember(sender.getFd());
