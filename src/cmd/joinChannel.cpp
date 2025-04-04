@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 10:52:09 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/03 19:48:55 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:45:17 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,11 @@ void Server::joinCommand(Client &client, const std::string &params)
 				LOG(INFO "Client " << client.getNickname() << " cannot join invite-only channel " << chanName)
 				continue;
 			}
+			if (channel->hasMode('l') && channel->getMembers().size() >= channel->getUserLimit()) {
+				sendNumericReply(client.getFd(), 471, chanName);  // ERR_CHANNELISFULL
+				LOG(INFO "Client " << client.getNickname() << " cannot join full channel " << chanName)
+				continue;
+			}
 		}
 
 		if (!channel->hasMember(client))
@@ -74,12 +79,28 @@ void Server::joinCommand(Client &client, const std::string &params)
 		sendJoinReplies(client, *channel);
 		
 		
-		std::string modes = channel->getModes();  // ex: "+ik"
+		std::string modes = channel->getModes();
 		std::string modeLine = ":ircserv 324 " + client.getNickname() + " " + chanName + " " + modes + "\r\n";
 		send(client.getFd(), modeLine.c_str(), modeLine.length(), 0);
 
 		LOG(INFO "Client " << client.getNickname() << " joined channel " << chanName)
 	}
+}
+
+std::string Server::getOpList(Channel &channel) {
+    std::string opList;
+    const std::vector<Client*>& members = channel.getMembers();
+
+    for (std::vector<Client*>::const_iterator it = members.begin(); it != members.end(); ++it) {
+        Client* member = *it;
+        if (channel.isOperator(member->getFd())) {
+            if (!opList.empty())
+                opList += " ";
+            opList += "@" + member->getNickname();  // Convention IRC : @ = operator
+        }
+    }
+
+    return opList;
 }
 
 void Server::sendJoinReplies(Client &client, Channel &channel)
@@ -122,4 +143,7 @@ void Server::sendJoinReplies(Client &client, Channel &channel)
 	// 5. RPL_ENDOFNAMES (366)
 	std::string rplEnd = ":" + _serverName + " 366 " + nick + " " + channelName + " :End of /NAMES list\r\n";
 	send(client.getFd(), rplEnd.c_str(), rplEnd.length(), 0);
+	
+	std::string op_list = getOpList(channel);
+	LOG(INFO "List des op du chan : " << op_list)
 }

@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 19:00:37 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/03 19:47:14 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:51:46 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void Server::modeCommand(Client &client, const std::string &params)
 		else {
 			LOG(DEBUG "Setting mode: " << c)
 			if (c == 'k' || c == 'l' || c == 'o'|| c == 'i' || c == 't') {
-				if ((adding == true) && (c == 'l' || c == 'k'))
+				if (((adding == true) && (c == 'l' || c == 'k' || c == 'o')) || (adding == false && c == 'o'))
 					iss >> arg;
 				else
 					arg = " ";
@@ -160,6 +160,7 @@ void Channel::setMode(char mode, bool enable, const Client& client, const std::s
 						_operators.insert(it->first);
 					else
 						_operators.erase(it->first);
+					LOG(INFO "Operator list = " << getOpList())
 					break;
 				}
 			}

@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/03 19:02:36 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:31:38 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ public:
 	std::map<const int, Client>				&getClients();
 	std::map<std::string, Channel*>			&getChannels();
 	Client									*getClient(Server *server, int fd);
-
+	Client									*getClientsByNickname(const std::string &nickname);
 		
 	/****************************************************************/
 	/******************************COMMANDS**************************/
@@ -120,7 +120,8 @@ public:
 	// void									changeNickname(Client client, std::string const &nickname);
 	// void									changeUsername(Client client, std::string const &username);
 	void									changePassword(Client client, std::string const &password);
-		
+	void									inviteCommand(Client &inviter, const std::string &params);
+
 	void									sendAllUsers(const std::string &msg, const std::string &nickname);
 
 	void									sendCapabilities(Client &sender);
@@ -156,6 +157,7 @@ public:
 	Channel*								getChannel(const std::string &name);
 	void 									sendMessageChannel(std::string &params, std::string &first_word,  Client &sender);
 	void 									sendJoinReplies(Client &client, Channel &channel);
+	std::string 							getOpList(Channel &channel);
 	
 	/*********************UTILS*********************************/
 

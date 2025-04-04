@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:45:49 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/03 19:19:38 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:51:05 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,17 @@ std::vector<std::string> Channel::getMemberNames() const
 		names.push_back(it->second->getNickname());
 	}
 	return names;
+}
+
+std::vector<Client*> Channel::getMembers() const
+{
+	std::vector<Client*> members;
+	std::map<int, Client*>::const_iterator it;
+	for (it = _members.begin(); it != _members.end(); ++it)
+	{
+		members.push_back(it->second);
+	}
+	return members;
 }
 
 void Channel::broadcast(const std::string& message, int exceptFd)
@@ -116,6 +127,22 @@ void Channel::sendNamesReply(Client &client) {
 	msg = "ircserv: 366 " + client.getNickname() + " " + chan + " :End of NAMES list\r\n";
 	send(client.getFd(), msg.c_str(), msg.size(), 0);
 	
+}
+
+std::string Channel::getOpList() const {
+    std::string opList;
+    const std::vector<Client*>& members = this->getMembers();
+
+    for (std::vector<Client*>::const_iterator it = members.begin(); it != members.end(); ++it) {
+        Client* member = *it;
+        if (this->isOperator(member->getFd())) {
+            if (!opList.empty())
+                opList += " ";
+            opList += "@" + member->getNickname();  // Convention IRC : @ = operator
+        }
+    }
+
+    return opList;
 }
 
 bool Channel::isInvited(const Client &client) const {

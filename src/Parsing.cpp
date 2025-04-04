@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/04/03 19:24:30 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:05:12 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,8 +99,8 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					changeNickname(sender->second, cmd.params);
 				else if (cmd.command == "JOIN")
 					this->joinCommand(sender->second, cmd.params);
-				// 	else if (cmd.command == "INVITE")
-				// 		sender->second.inviteToChannel(msg);
+				else if (cmd.command == "INVITE")
+					this->inviteCommand(sender->second, cmd.params);
 				// 	else if (cmd.command == "LIST")
 				// 		sender->second.listChannels();
 				else if (cmd.command == "MODE")

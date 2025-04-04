@@ -6,7 +6,7 @@
 #    By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/23 13:36:33 by hulefevr          #+#    #+#              #
-#    Updated: 2025/04/03 19:21:34 by hulefevr         ###   ########.fr        #
+#    Updated: 2025/04/04 12:05:52 by hulefevr         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,6 +34,7 @@ SRC		=	main.cpp \
 			./src/cmd/leaveChannel.cpp \
 			./src/cmd/Mode.cpp \
 			./src/cmd/kickFromChannel.cpp \
+			./src/cmd/Invite.cpp \
 
 NAME	=	ircserv
 

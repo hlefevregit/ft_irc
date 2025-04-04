@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 18:24:37 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/03 18:56:02 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:02:47 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,4 +65,12 @@ std::map<const int, Client>::iterator	Server::getClientByNickname(const std::str
 	}
 	LOG(ERROR "Client nicknamed " << nickname << " not found amongs the clients !")
 	return (end);
+}
+
+Client	*Server::getClientsByNickname(const std::string& nick) {
+    for (std::map<const int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        if (it->second.getNickname() == nick)
+            return &it->second;
+    }
+    return NULL;
 }

@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:41:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/03 19:16:48 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:55:28 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ private:
 	std::set<char>			_modes;
 	std::set<std::string>	_invitedNicknames;
 	
-	int						_userLimit;
+	size_t						_userLimit;
 
 public:
 	Channel();
@@ -45,6 +45,8 @@ public:
 	const std::string&			getTopic() const { return _topic; };
 	void 						setTopic(const std::string& topic) { _topic = topic; };
 	void 						setName(const std::string& name) { _name = name; };
+	size_t						getUserLimit() const { return _userLimit; };
+
 
 	// Membres
 	bool 						hasMember(const Client& client) const;
@@ -52,6 +54,7 @@ public:
 	void 						addMember(Client *client);
 	void 						removeMember(int fd);
 	std::vector<std::string>	getMemberNames() const;
+	std::vector<Client*>		getMembers() const;
 
 
 	// Broadcast
@@ -62,6 +65,8 @@ public:
 	void						addOperator(int fd);
 	bool						isOperator(int fd) const;
 	bool						isOperator(const Client &client) const;
+	std::set<int>				getOperators() const { return _operators; }
+	std::string					getOpList() const;
 
 	bool						hasMode(char c) const;
 	const						std::string& getKey() const;
@@ -70,7 +75,6 @@ public:
 	// Invites
 	bool						isInvited(const Client &client) const;
 	void						inviteClient(const Client &client);
-
 	void						setMode(char mode, bool emable, const Client &client, const std::string &arg = "");
 	std::string					getModes() const;
 };

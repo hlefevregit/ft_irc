@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Topic.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 17:19:42 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/04/01 20:56:06 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/04 12:13:00 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,16 @@ void	Server::changeTopic(Client &sender, std::string &params)
 		++paramsStart;
 	}
 
+	if (channel->hasMode('t'))
+	{
+		if (!channel->isOperator(sender.getFd()))
+		{
+			LOG(ERROR "User is not a channel operator ❌")
+			std::string	numerical = ERR_CHANOPRIVSNEEDED(channel->getName());
+			send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
+			return ;
+		}
+	}
 	// Broadcast the change to all clients in the channel
 	LOG(INFO "Broadcasting new topic in " << channel->getName() << "...")
 	std::string	broadcast = RPL_TOPIC_BROADCAST(sender.getNickname(), channel->getName(), newTopic);
