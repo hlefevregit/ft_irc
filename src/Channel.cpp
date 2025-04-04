@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:45:49 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 12:51:05 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 13:42:39 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,13 @@ std::vector<Client*> Channel::getMembers() const
 
 void Channel::broadcast(const std::string& message, int exceptFd)
 {
+	AUTO_LOG
 	std::map<int, Client*>::const_iterator it;
 	for (it = _members.begin(); it != _members.end(); ++it)
 	{
 		if (it->second->getFd() != exceptFd)
 		{
+			LOG(DEBUG "Sending message to client " << it->second->getFd())
 			send(it->second->getFd(), message.c_str(), message.size(), 0);
 		}
 	}
@@ -103,6 +105,23 @@ const std::string& Channel::getKey() const
 bool Channel::isOperator(const Client& client) const 
 {
 	return _operators.find(client.getFd()) != _operators.end();
+}
+
+bool Channel::isOperator(const std::set<int>::iterator &it) const 
+{
+	return _operators.find(*it) != _operators.end();
+}
+
+int	Channel::getMemberFd(std::vector<std::string>::iterator it) const
+{
+	std::map<int, Client*>::const_iterator memberIt = _members.begin();
+	while (memberIt != _members.end())
+	{
+		if (memberIt->second->getNickname() == *it)
+			return memberIt->second->getFd();
+		memberIt++;
+	}
+	return -1;
 }
 
 void Channel::sendNumericReply(int fd, int code, const std::string& message) const 

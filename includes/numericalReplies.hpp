@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   numericalReplies.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 16:05:53 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/03 18:51:02 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/04 13:25:03 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #define ERR_USERONCHANNEL(usr, channel) "443 " + usr + " " + channel + " :is already on channel\n"
 #define RPL_INVITING(channel, nick) "341 " + nick + " " + channel + " :Inviting\n"
 #define RPL_AWAY(nick, msg) "301 " + nick + " " + msg + " :away\n"
-#define RPL_WELCOME(nick) "001 " + nick + " :Welcome to our IRC server\n"
+#define RPL_WELCOME(nick) ":irc.ircserv.fr 001 " + nick + " :Welcome to our IRC server\n"
 #define RPL_YOURHOST(server) ":" server " 002 nickname :Your host is " server "\n"
 #define RPL_CREATED(server, nick, host) ":" server " 003 " nick " :This server was created Sat Mar 28 2025 at 12:00:00 UTC"
 #define RPL_MYINFO(nick, user, host) "003 " + nick + " :Welcome to our IRC server\n"
@@ -57,7 +57,7 @@
 
 /*---------------NICK-------------------*/
 
-#define ERR_NICKNAMEINUSE(nick) "433 " + nick + " :Nickname is already in use\n"
+#define ERR_NICKNAMEINUSE(nick) ":irc.ircserv.fr 433 " + nick + " :Nickname is already in use\n"
 #define ERR_NICKCOLLISION(nick, user, host) "436 " +  nick + " :Nickname collision KILL from " + user + "@" + host + "\n"
 #define ERR_RESTRICTED "484 :Your connection is restricted!\n"
 #define ERR_ERRONEUSNICKNAME(nick) "432 " + nick + " :Erroneus nickname\n"

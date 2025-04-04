@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 16:41:55 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 12:55:28 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 13:38:19 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ public:
 	void 						setName(const std::string& name) { _name = name; };
 	size_t						getUserLimit() const { return _userLimit; };
 
+	int							getMemberFd(std::vector<std::string>::iterator it) const;
 
 	// Membres
 	bool 						hasMember(const Client& client) const;
@@ -64,6 +65,7 @@ public:
 	// Operators
 	void						addOperator(int fd);
 	bool						isOperator(int fd) const;
+	bool						isOperator(const std::set<int>::iterator &it) const;
 	bool						isOperator(const Client &client) const;
 	std::set<int>				getOperators() const { return _operators; }
 	std::string					getOpList() const;

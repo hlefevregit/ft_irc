@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 10:52:09 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 12:45:17 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 13:43:58 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ void Server::sendJoinReplies(Client &client, Channel &channel)
 	// 1. JOIN
 	std::string joinMsg = prefix + " JOIN " + channelName + "\r\n";
 	LOG(INFO "Sending JOIN message to client " << client.getFd())
+	channel.broadcast(joinMsg, client.getFd());
 	send(client.getFd(), joinMsg.c_str(), joinMsg.length(), 0);
 
 	// 2. RPL_TOPIC (332)
@@ -134,7 +135,9 @@ void Server::sendJoinReplies(Client &client, Channel &channel)
 	std::vector<std::string> members = channel.getMemberNames();
 	for (std::vector<std::string>::iterator it = members.begin(); it != members.end(); ++it) {
 		if (!nameList.empty())
-			nameList += " ";
+			nameList += " ";  // Convention IRC : @ = operator
+		if (channel.isOperator(channel.getMemberFd(it)))
+			nameList += "@";
 		nameList += *it;
 	}
 	std::string rplNames = ":" + _serverName + " 353 " + nick + " = " + channelName + " :" + nameList + "\r\n";
