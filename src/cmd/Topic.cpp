@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 17:19:42 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/04/04 14:59:33 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/04 16:54:10 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ void	Server::changeTopic(Client &sender, std::string &params)
 	// Checks if the sender client is present in the said channel
 	if (channelNicknamesStart == channelNicknamesEnd)
 	{
+		std::string	numerical = ERR_NOTONCHANNEL(extractedChannelName);
+		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
 		LOG(ERROR "User is not in the said channel ❌")
 		return ;
 	}

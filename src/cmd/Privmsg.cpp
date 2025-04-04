@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:50:02 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/03 18:05:44 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/04 21:23:05 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,9 @@ void	Server::sendMessageUser(std::string &msg, const std::string &nickname, Clie
 	// Check if the user is found in the server to send a message to
 	if (reciever->first == client_end->first)
 	{
-		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
+		std::string numerical = ERR_NOSUCHNICK(nickname);
+		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
 		LOG(ERROR "sendMessageUser: client does not exist !")
-		return ;
-	}
-
-	// Check if the sender is sending a PRIVMSG to itself
-	if (sender.getNickname() == reciever->second.getNickname())
-	{
-		LOG(ERROR "sendMessageUser: cannot send a PRIVMSG to itself !")
-		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
 		return ;
 	}
 
@@ -71,8 +62,8 @@ void	Server::sendMessageUser(std::string &msg, const std::string &nickname, Clie
 	std::string	cleaned_message(start, end);
 	if (cleaned_message.empty())
 	{
-		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
+		std::string numerical = ERR_NEEDMOREPARAMS(std::string("PRIVMSG"));
+		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
 		std::cerr << ERROR << "sendMessageUser: cleaned_message is empty !" << RESET << std::endl;
 		return ;
 	}
@@ -80,7 +71,7 @@ void	Server::sendMessageUser(std::string &msg, const std::string &nickname, Clie
 	/************************/
 	/* Send message to user */
 	/************************/
-	std::string	message = CYAN "Private message from [" + sender.getUsername() + "]: " + RESET + cleaned_message + "\n";
+	std::string	message = sender.getPrefix() + " PRIVMSG " + sender.getNickname() + " :" + cleaned_message + "\r\n";
 	message = AnsiToMircConverter().convertAnsiToMirc(message);
 	send(reciever->first, message.c_str(), message.size(), 0);
 
@@ -99,8 +90,8 @@ int    Server::sendMessage(Client sender, std::string &params)
 	// Check if msg is empty
 	if (params.empty())
 	{
-		// std::string numerical = ERR_NEEDMOREPARAMS(PRIVMSG);
-		// send(sender, numerical, numerical.size(), 0);  // TODO : use numerical correctly
+		std::string numerical = ERR_NEEDMOREPARAMS(std::string("PRIVMSG"));
+		send(sender.getFd(), numerical.c_str(), numerical.size(), 0);
 		LOG(ERROR "sendMessage: messsage is empty !")
 		return 1;
 	}
@@ -124,6 +115,8 @@ int    Server::sendMessage(Client sender, std::string &params)
 			LOG(DEBUG "is Channel")
 			sendMessageChannel(params, first_word, sender);    // TODO : dguerin implementation
 		}
+		else if (first_word == "joe")
+			botParse(sender, params);
 		else
 		{
 			LOG(DEBUG "is User")

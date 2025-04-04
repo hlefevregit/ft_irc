@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 15:58:54 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/04 20:05:01 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ public:
 	Client									*getClientsByNickname(const std::string &nickname);
 		
 	/****************************************************************/
-	/******************************COMMANDS**************************/
+	/****************************COMMANDS****************************/
 	/****************************************************************/
 
 
@@ -147,11 +147,12 @@ public:
 	std::vector<std::string>				splitByDelimiter(std::string input, char delimiter);
 	
 	void									modeCommand(Client &client, const std::string &params);
-	// void	botParse(Client sender, std::string &params);
-	// void	botHelp(Client sender);
+	void									botParse(Client sender, std::string &params);
+	void									botHelp(Client sender);
+	void									botGetRandomAsciiArt(Client sender);
 
 	/***********************************************************/
-	/******************************CHANNEL**********************/
+	/**************************CHANNEL**************************/
 	/***********************************************************/
 
 	Channel*								getChannel(const std::string &name);
@@ -159,7 +160,7 @@ public:
 	void 									sendJoinReplies(Client &client, Channel &channel);
 	std::string 							getOpList(Channel &channel);
 	
-	/*********************UTILS*********************************/
+	/***************************UTILS***************************/
 
 	std::vector<pollfd>::iterator 			findPollfdIterator(int fd, std::vector<pollfd> &pollfds);
 };

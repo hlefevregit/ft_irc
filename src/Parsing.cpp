@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/04/04 16:19:56 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 18:52:20 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,10 +143,6 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					printChannelList();
 				else if (cmd.command == "PRINT" && cmd.params != "list channels")
 					printUsersInChannel(cmd.params);
-
-				// 	else if (msg.find("@joe") != std::string::npos || msg.find("/joe") != std::string::npos)
-				// 		botParse(sender->second, cmd.params);
-				// 		sender->second.sendMessage(sender->second, cmd.params);
 			}
 			if (client)
 				client->resetBuffer();

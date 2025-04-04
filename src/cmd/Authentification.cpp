@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:47:25 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/01 20:21:22 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/04 18:27:28 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,11 @@ void	Server::connectToServerWithPass(Client &sender, std::string &params)
 	// Truncate pass until separator
 	pass = pass.substr(0, endPos);
 
-	// Last checks
+	// Empty checks
 	if (pass.empty())
 	{
+		std::string numerical = ERR_NEEDMOREPARAMS(std::string("PASS"));
+		send(sender.getFd(), numerical.c_str(), numerical. size(), 0);
 		LOG(ERROR "pass empty !")
 		return ;
 	}
@@ -113,7 +115,7 @@ void	Server::changeNickname(Client &sender, std::string &params)
 
 	nickname = std::string(start, end);
 
-	// Last checks
+	// Empty check
 	if (nickname.empty())
 	{
 		std::string numerical = ERR_NONICKNAMEGIVEN;
@@ -189,7 +191,7 @@ void	Server::changeUsername(Client &sender, std::string &params)
 	// Truncate username to fit 9 chars
 	username = username.length() > 9 ? username.substr(0, endPos) : username;
 
-	// Last checks
+	// Empty checks
 	if (username.empty())
 	{
 		std::string numerical = ERR_NEEDMOREPARAMS(std::string("USER"));
