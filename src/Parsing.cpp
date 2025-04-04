@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:22:27 by hugolefevre       #+#    #+#             */
-/*   Updated: 2025/04/04 12:05:12 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/04 16:19:56 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,11 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 	std::vector<std::string>				cmds;
 	std::map<const int, Client>::iterator	sender = _clients.find(client->getFd());
 	
+	if (sender == _clients.end())
+	{
+		LOG(ERROR "Sender not found")
+		return 3;
+	}
 	splitMessage(cmds, message);
 	
 	for (size_t i = 0; i != cmds.size(); i++)
@@ -119,7 +124,10 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 					// botParse(sender->second, cmd.params);
 				}
 				else if (cmd.command == "QUIT")
+				{
 					quitServer(sender->second, pollfds);
+					return 3;
+				}
 				else if (cmd.command == "PASS")
 				{
 					std::string numerical = ERR_ALREADYREGISTRED;
@@ -140,7 +148,8 @@ int	Server::parseMessage(Client *client, std::string const &message, std::vector
 				// 		botParse(sender->second, cmd.params);
 				// 		sender->second.sendMessage(sender->second, cmd.params);
 			}
-			client->resetBuffer();
+			if (client)
+				client->resetBuffer();
 		}
 	}
 

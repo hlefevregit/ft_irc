@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:46:11 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/01 20:24:21 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/04 16:17:59 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,7 @@ int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 	Client* client = getClient(this, fd);
 	if (!client) {
 		std::cerr << RED << "[ERROR] Client not found for fd " << fd << RESET << std::endl;
-		deleteClient(pollfds, fd);
+		// deleteClient(pollfds, fd);
 		return 3;
 	}
 
@@ -201,7 +201,10 @@ int Server::readFromClient(std::vector<pollfd> &pollfds, std::vector<pollfd>::it
 	}
 
 	if (totalBuffer.empty())
+	{
+		if (client)
 		client->resetBuffer();
+	}
 	// std::cout << "AFTER : '" << client->getReadBuffer() << "'" << std::endl;
 
 	return 0;

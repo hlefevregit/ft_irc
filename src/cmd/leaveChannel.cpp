@@ -88,17 +88,17 @@ void	Server::leaveChannel(Client &sender, std::string &params)
 	while (selectedChannelsStart != selectedChannelsEnd)
 	{
 		LOG(DEBUG "Leaving channel : " << *selectedChannelsStart)
-		Channel *	selectedChannel = getChannel(*selectedChannelsStart);
+		Channel	*selectedChannel = getChannel(*selectedChannelsStart);
 		if (leaveBroadcast.empty())	// Case there is no leave message
 		{
 			LOG(INFO "CASE default")
-			std::string	numerical = sender.getPrefix() + " PART " + selectedChannel->getName() + " :has left" ;
+			std::string	numerical = ":irc.ircserv.fr " + sender.getPrefix() + " PART " + selectedChannel->getName() + " :" + sender.getNickname() + " has left the channel\n";
 			selectedChannel->broadcast(numerical);	// Use default leave message
 		}
 		else						// Case there is a leave message
 		{
 			LOG(INFO "CASE custom leaving message")
-			std::string	numerical = sender.getPrefix() + " PART " + selectedChannel->getName() + " :" + leaveBroadcast;
+			std::string	numerical = sender.getPrefix() + " PART " + selectedChannel->getName() + " :" + leaveBroadcast + "\n";
 			selectedChannel->broadcast(numerical);	// Use optional leave message
 		}
 		LOG(INFO "User " << sender.getNickname() << " leaved " << selectedChannel->getName())
