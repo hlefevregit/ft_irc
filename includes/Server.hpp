@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/07 11:28:49 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/07 18:14:44 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,6 +154,7 @@ public:
 	void									botHelp(Client sender);
 	void									botGetRandomAsciiArt(Client sender);
 	void									botListConnectedClients(Client sender);
+	void									botListChannels(Client sender);
 
 	/***********************************************************/
 	/**************************CHANNEL**************************/

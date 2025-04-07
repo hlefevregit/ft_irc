@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:49:14 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/07 18:05:44 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/07 18:27:31 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ void	Server::botParse(Client sender, std::string &params)
 		botGetRandomAsciiArt(sender);
 	else if (command == ":list" || command == "list")
 		botListConnectedClients(sender);
+	else if (command == ":channels" || command == "channels")
+		botListChannels(sender);
 	else
 		botHelp(sender);
 
@@ -163,20 +165,26 @@ void	Server::botListConnectedClients(Client sender)
 		std::ostringstream	oss;
 	
 		oss << client.getFd();
-		addCellData(data, client.getNickname(), LEFT);
-		addCellData(data, client.getUsername(), LEFT);
+		if (!client.getNickname().empty())
+			addCellData(data, client.getNickname(), LEFT);
+		else
+			addCellData(data, "No nickname", CENTER);
+		if (!client.getUsername().empty())
+			addCellData(data, client.getUsername(), LEFT);
+		else
+			addCellData(data, "No username", CENTER);
 		addCellData(data, oss.str(), LEFT);
 		++start;
 		oss.clear();
-		LOG(ERROR "1")
 	}
 
 	unsigned short						y = clients.size() + 1;
 	std::vector<std::string>			grid = getGrid(data, 60, 3, y);
 	std::vector<std::string>::iterator	gridStart = grid.begin();
 	std::vector<std::string>::iterator	gridEnd = grid.end();
-	printGrid(data, 60, 3, y);
 
+	LOG(INFO "Clients connected : " << clients.size())
+	LOG(INFO "Sent list of connected clients to " << sender.getNickname())
 	while (gridStart != gridEnd)
 	{
 		std::string	message = 
@@ -185,9 +193,51 @@ void	Server::botListConnectedClients(Client sender)
 			+ " :" + *gridStart;
 		send(sender.getFd(), message.c_str(), message.size(), 0);
 		++gridStart;
-		LOG(ERROR "2")
 	}
 
-	LOG(ERROR "3")
+
+	return ;
+}
+
+void	Server::botListChannels(Client sender)
+{
+	AUTO_LOG
+	std::map<std::string, Channel*>				channels = getChannels();
+	std::map<std::string, Channel*>::iterator	start = channels.begin();
+	std::map<std::string, Channel*>::iterator	end = channels.end();	
+	t_cell_data									data;
+
+	addCellData(data, "Channels", CENTER);
+	addCellData(data, "Topic", CENTER);
+
+	while (start != end)
+	{
+		Channel				*channel = start->second;
+	
+		addCellData(data, channel->getName(), LEFT);
+		if (!channel->getTopic().empty())
+			addCellData(data, channel->getTopic(), LEFT);
+		else
+			addCellData(data, "No topic", CENTER);
+		++start;
+	}
+
+	unsigned short						y = channels.size() + 1;
+	std::vector<std::string>			grid = getGrid(data, 60, 2, y);
+	std::vector<std::string>::iterator	gridStart = grid.begin();
+	std::vector<std::string>::iterator	gridEnd = grid.end();
+
+	LOG(INFO "Channels existing : " << channels.size())
+	LOG(INFO "Sent list of existing channels to " << sender.getNickname())
+	while (gridStart != gridEnd)
+	{
+		std::string	message = 
+			":joe!joe@localhost PRIVMSG "\
+			+ sender.getNickname()\
+			+ " :" + *gridStart;
+		send(sender.getFd(), message.c_str(), message.size(), 0);
+		++gridStart;
+	}
+
 	return ;
 }
