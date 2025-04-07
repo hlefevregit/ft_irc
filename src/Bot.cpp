@@ -6,11 +6,12 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:49:14 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 22:00:23 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/07 18:05:44 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Bot.hpp"
+
 
 
 void	Server::botParse(Client sender, std::string &params)
@@ -36,8 +37,10 @@ void	Server::botParse(Client sender, std::string &params)
 		LOG(ERROR "First word is not joe !")
 		return ;
 	}
-	if (command == ":ascii")
+	if (command == ":ascii" || command == "ascii")
 		botGetRandomAsciiArt(sender);
+	else if (command == ":list" || command == "list")
+		botListConnectedClients(sender);
 	else
 		botHelp(sender);
 
@@ -81,8 +84,10 @@ void Server::botGetRandomAsciiArt(Client sender)
 	DIR*						dir = opendir("./assets");
 	struct dirent*				ent;
 
+	// Check if the directory was opened successfully
 	if (dir != NULL)
 	{
+		// Read the directory entries
 		while ((ent = readdir(dir)) != NULL)
 		{
 			std::string	filename = ent->d_name;
@@ -138,4 +143,51 @@ void Server::botGetRandomAsciiArt(Client sender)
 		send(sender.getFd(), message.c_str(), message.size(), 0);
 	}
 	file.close();
+}
+
+void	Server::botListConnectedClients(Client sender)
+{
+	AUTO_LOG
+	std::map<const int, Client>				clients = getClients();
+	std::map<const int, Client>::iterator	start = clients.begin();
+	std::map<const int, Client>::iterator	end = clients.end();
+	t_cell_data								data;
+
+	addCellData(data, "Nickname", CENTER);
+	addCellData(data, "Username", CENTER);
+	addCellData(data, "Socket", CENTER);
+
+	while (start != end)
+	{
+		Client				client = start->second;
+		std::ostringstream	oss;
+	
+		oss << client.getFd();
+		addCellData(data, client.getNickname(), LEFT);
+		addCellData(data, client.getUsername(), LEFT);
+		addCellData(data, oss.str(), LEFT);
+		++start;
+		oss.clear();
+		LOG(ERROR "1")
+	}
+
+	unsigned short						y = clients.size() + 1;
+	std::vector<std::string>			grid = getGrid(data, 60, 3, y);
+	std::vector<std::string>::iterator	gridStart = grid.begin();
+	std::vector<std::string>::iterator	gridEnd = grid.end();
+	printGrid(data, 60, 3, y);
+
+	while (gridStart != gridEnd)
+	{
+		std::string	message = 
+			":joe!joe@localhost PRIVMSG "\
+			+ sender.getNickname()\
+			+ " :" + *gridStart;
+		send(sender.getFd(), message.c_str(), message.size(), 0);
+		++gridStart;
+		LOG(ERROR "2")
+	}
+
+	LOG(ERROR "3")
+	return ;
 }

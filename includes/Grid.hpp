@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Grid.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 22:38:06 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/03/28 18:24:37 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/07 14:16:19 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,3 +75,9 @@ void			printGrid(t_cell_data &cell_data, unsigned short width, unsigned short x_
 std::string		trimWithoutTakingOutColorCodes(std::string input, int max_lenght);
 std::string		truncate_entry(std::string input, unsigned short max_lenght, unsigned short alignment);
 unsigned int	getStringLenghtWithoutColors(std::string &str);
+
+std::vector<std::string>	getGrid(t_cell_data &cell_data, unsigned short width, unsigned short x_cells, unsigned short y_cells);
+std::string					getCeiling(unsigned short width, unsigned short max_cell_size);
+std::string					getFloor(unsigned short width, unsigned short max_cell_size);
+std::string					getYSeparator(unsigned short width, unsigned short max_cell_size);
+std::string					getLine(std::string str, unsigned short max_col_lenght, int alignment, bool is_last_cell);

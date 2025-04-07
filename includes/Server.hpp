@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 20:05:01 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/07 11:28:49 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,11 +145,15 @@ public:
 	void									leaveChannel(Client &sender, std::string &params);
 	void									kickFromChannel(Client &sender, std::string &params);
 	std::vector<std::string>				splitByDelimiter(std::string input, char delimiter);
-	
-	void									modeCommand(Client &client, const std::string &params);
+
+	/***********************************************************/
+	/****************************BOT****************************/
+	/***********************************************************/
+
 	void									botParse(Client sender, std::string &params);
 	void									botHelp(Client sender);
 	void									botGetRandomAsciiArt(Client sender);
+	void									botListConnectedClients(Client sender);
 
 	/***********************************************************/
 	/**************************CHANNEL**************************/
@@ -159,6 +163,7 @@ public:
 	void 									sendMessageChannel(std::string &params, std::string &first_word,  Client &sender);
 	void 									sendJoinReplies(Client &client, Channel &channel);
 	std::string 							getOpList(Channel &channel);
+	void									modeCommand(Client &client, const std::string &params);
 	
 	/***************************UTILS***************************/
 

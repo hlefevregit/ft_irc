@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Grid.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 22:38:13 by ldalmass          #+#    #+#             */
-/*   Updated: 2025/03/28 18:22:33 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/07 18:00:43 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -374,4 +374,197 @@ void	printGrid(t_cell_data &cell_data, unsigned short width, unsigned short x_ce
 			printYSeparator(width, max_cell_size);
 	}
 	printFloor(width, max_cell_size);
+}
+
+std::string	getLine(std::string str, unsigned short max_col_lenght, int alignment, bool is_last_cell)
+{
+	std::string	result = "";
+	// Fill in the gaps and truncate if needed
+	std::string	trunc_str = truncate_entry(str, max_col_lenght - 1, alignment);
+
+	// Print the cell
+	result += "│";
+	result += trunc_str;
+	if (is_last_cell == true)
+	{
+		result += "│";
+		result += "\r\n";
+	}
+	return (result);
+}
+
+std::string	getCeiling(unsigned short width, unsigned short max_cell_size)
+{
+	std::string	result;
+
+	for (unsigned short i = 0; i < width; i++)
+	{
+		// Top left
+		if (i == 0)
+		{
+			result += "┌";
+			continue;
+		}
+		// Top Right
+		if (i == width - 2)
+		{
+			result += "┐";
+			continue;
+		}
+		// Separators
+		if (i % max_cell_size == 0 && i != width - 2)
+		{
+			result += "┬";
+			continue;
+		}
+		// Ceiling
+		if (i < width - 2)
+			result += "─";
+	}
+	result += "\r\n";
+	return (result);
+}
+
+std::string	getFloor(unsigned short width, unsigned short max_cell_size)
+{
+	std::string	result;
+	for (unsigned short i = 0; i < width; i++)
+	{
+		// Top left
+		if (i == 0)
+		{
+			result += "└";
+			continue;
+		}
+		// Top Right
+		if (i == width - 2)
+		{
+			result += "┘";
+			continue;
+		}
+		// Separators
+		if (i % max_cell_size == 0 && i != width - 2)
+		{
+			result += "┴";
+			continue;
+		}
+		// Ceiling
+		if (i < width - 2)
+			result += "─";
+	}
+	result += "\r\n";
+	return (result);
+}
+
+std::string	getYSeparator(unsigned short width, unsigned short max_cell_size)
+{
+	std::string	result;
+	for (unsigned short i = 0; i < width; i++)
+	{
+		// Left
+		if (i == 0)
+		{
+			result += "├";
+			continue;
+		}
+		// Right
+		if (i == width - 2)
+		{
+			result += "┤";
+			continue;
+		}
+		// Separators
+		if (i % max_cell_size == 0 && i != width - 2)
+		{
+			result += "┼";
+			continue;
+		}
+		// Line
+		if (i < width - 2)
+			result += "─";
+	}
+	result += "\r\n";
+	return (result);
+}
+
+std::vector<std::string>	getGrid(t_cell_data &cell_data, unsigned short width, unsigned short x_cells, unsigned short y_cells)
+{
+	std::vector<std::string>	result;
+
+	// Ensure width does not exceed terminal width
+	unsigned short	col = getTerminalWidth();
+	unsigned short	max_cell_size;
+	width = (width > col) ? col : width;
+	max_cell_size = width - 2;
+
+	// Ensure y_cells is at least 1
+	if (y_cells == 0)
+		y_cells = 1;
+
+	// Ensure x_cells is at least 1
+	if (x_cells == 0)
+		x_cells = 1;
+
+	// Adjust x_cells to properly fit within width
+	if (x_cells > width - 2)
+		x_cells = (width - 2) / 2;  // Ensure at least 2 spaces per cell
+
+	// Calculate max_cell_size safely
+	if (x_cells > 1)
+	{
+		max_cell_size = (width - 2) / x_cells;
+		if (max_cell_size == 0)
+			max_cell_size = 1;  // Ensure at least 1 character per cell
+		width = (max_cell_size * x_cells) + 2;
+	}
+
+	// Add a default behaviour to last element in vector
+	cell_data.message.push_back("");
+	cell_data.alignment.push_back(0);
+
+	// Get iterators for message and alignment vectors
+	std::vector<std::string>::iterator	msg_start = cell_data.message.begin();
+	std::vector<std::string>::iterator	msg_end = cell_data.message.end();
+	std::vector<int>::iterator			ali_start = cell_data.alignment.begin();
+	std::vector<int>::iterator			ali_end = cell_data.alignment.end();
+	std::string							message = "";
+
+	// Print Grid
+	result.push_back(getCeiling(width, max_cell_size));
+	for (unsigned short y = 0; y < y_cells; y++)
+	{
+		// Print cells
+		for (unsigned short i = 0; i < x_cells; i++)
+		{
+			// Ensure we do not go past the last element
+			if (msg_start == msg_end)
+				--msg_start;
+			if (ali_start == ali_end)
+				--ali_start;
+
+			// Print the cell
+			bool is_last = (i == x_cells - 1);
+
+			// Append the line to the message
+			if (is_last == true)
+			{
+				message += getLine(*msg_start, max_cell_size, *ali_start, is_last);
+				result.push_back(message);
+				message.clear();
+			}
+			else
+				message += getLine(*msg_start, max_cell_size, *ali_start, is_last);
+
+			// Move to the next element if possible
+			if (msg_start != msg_end)
+				++msg_start;
+			if (ali_start != ali_end)
+				++ali_start;
+		}
+
+		if (y != y_cells - 1)
+			result.push_back(getYSeparator(width, max_cell_size));
+	}
+	result.push_back(getFloor(width, max_cell_size));
+	return (result);
 }
