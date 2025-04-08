@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 13:41:34 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/07 18:14:44 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/08 13:48:41 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,7 @@ public:
 	void									botGetRandomAsciiArt(Client sender);
 	void									botListConnectedClients(Client sender);
 	void									botListChannels(Client sender);
+	void									botListChannelDetail(Client sender, std::string &channelName);
 
 	/***********************************************************/
 	/**************************CHANNEL**************************/

@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:49:14 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/07 18:27:31 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:06:24 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ void	Server::botParse(Client sender, std::string &params)
 		botListConnectedClients(sender);
 	else if (command == ":channels" || command == "channels")
 		botListChannels(sender);
+	else if (parameters.size() == 3 && (parameters[1] == ":channel" || parameters[1] == "channel"))
+		botListChannelDetail(sender, parameters[2]);
 	else
 		botHelp(sender);
 
@@ -239,5 +241,63 @@ void	Server::botListChannels(Client sender)
 		++gridStart;
 	}
 
+	return ;
+}
+
+void	Server::botListChannelDetail(Client sender, std::string &channelName)
+{
+	AUTO_LOG
+
+	Channel	*channel = getChannel(channelName);
+
+	// Check if the channel exists
+	if (channel == NULL)
+	{
+		LOG(ERROR "Channel " << channelName << " doesn't exist")
+		std::string	message = 
+			":joe!joe@localhost PRIVMSG "\
+			+ sender.getNickname()\
+			+ " :Channel " + channelName + " doesn't exist\r\n";
+		send(sender.getFd(), message.c_str(), message.size(), 0);
+		return ;
+	}
+
+	LOG(INFO "Channel " << channelName << " exists")
+
+	// Lists all the client ont that channel
+	std::vector<Client *>			clients = channel->getMembers();
+	std::vector<Client *>::iterator	start = clients.begin();
+	std::vector<Client *>::iterator	end = clients.end();
+	t_cell_data						data;
+
+	addCellData(data, "Nickname", CENTER);
+	addCellData(data, "Username", CENTER);
+	addCellData(data, "Role", CENTER);
+	while (start != end)
+	{
+		addCellData(data, (*start)->getNickname(), LEFT);
+		addCellData(data, (*start)->getUsername(), LEFT);
+		if (channel->isOperator((*start)->getFd()))
+			addCellData(data, "Operator", LEFT);
+		else
+			addCellData(data, "Member", LEFT);
+		++start;
+	}
+
+	// Send the grid to the client
+	unsigned short						y = clients.size() + 1;
+	std::vector<std::string>			grid = getGrid(data, 60, 3, y);
+	std::vector<std::string>::iterator	gridStart = grid.begin();
+	std::vector<std::string>::iterator	gridEnd = grid.end();
+	LOG(INFO "Sent list of channel " << channelName << " to " << sender.getNickname())
+	while (gridStart != gridEnd)
+	{
+		std::string	message = 
+			":joe!joe@localhost PRIVMSG "\
+			+ sender.getNickname()\
+			+ " :" + *gridStart;
+		send(sender.getFd(), message.c_str(), message.size(), 0);
+		++gridStart;
+	}
 	return ;
 }
