@@ -6,7 +6,7 @@
 /*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 19:00:37 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 12:51:46 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/08 17:48:00 by hulefevr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,8 @@ void Server::modeCommand(Client &client, const std::string &params)
 
 	// Check if client is operator
 	if (!channel->isOperator(client.getFd())) {
-		sendNumericReply(client.getFd(), 482, channelName); // You're not channel operator
+		std::string msg = ":ircserv 482 " + client.getNickname() + " " + channelName + " :You're not channel operator\r\n";
+		send(client.getFd(), msg.c_str(), msg.length(), 0);
 		return;
 	}
 
@@ -103,6 +104,16 @@ void Channel::setMode(char mode, bool enable, const Client& client, const std::s
 {
 	AUTO_LOG
 	LOG(INFO "Client " << client.getNickname() << " set mode " << (enable ? "+" : "-") << mode << " on channel " << _name)
+	if (!isOperator(client.getFd())) {
+		LOG(INFO "Client " << client.getNickname() << " failed to set mode " << mode << " on channel " << _name << " (not operator)")
+		sendNumericReply(client.getFd(), 482, _name); // You're not channel operator
+		return;
+	}
+	if (hasMember(client.getFd()) == false) {
+		LOG(INFO "Client " << client.getNickname() << " failed to set mode " << mode << " on channel " << _name << " (not member)")
+		sendNumericReply(client.getFd(), 442, _name); // You're not on that channel
+		return;
+	}
 	switch (mode) {
 		case 'i':
 			if (enable)
@@ -120,19 +131,27 @@ void Channel::setMode(char mode, bool enable, const Client& client, const std::s
 			break;
 
 		case 'k':
-			if (enable) {
-				if (!arg.empty()) {
-					_modes.insert('k');
-					_key = arg;
-					LOG(DEBUG "Key set to " << _key)
+			if (isOperator(client.getFd()))
+			{
+				if (enable) {
+					if (!arg.empty()) {
+						_modes.insert('k');
+						_key = arg;
+						LOG(DEBUG "Key set to " << _key)
+					}
+				} else {
+					_modes.erase('k');
+					_key = "";
 				}
-			} else {
-				_modes.erase('k');
-				_key = "";
+				LOG(DEBUG "Mode 'k' set to " << (enable ? "enabled" : "disabled"))
+				
 			}
-			LOG(DEBUG "Mode 'k' set to " << (enable ? "enabled" : "disabled"))
+			else
+			{
+				LOG(INFO "Client " << client.getNickname() << " failed to set mode k on channel " << _name << " (not operator)")
+				sendNumericReply(client.getFd(), 482, _name); // You're not channel operator
+			}
 			break;
-
 		case 'l':
 			if (enable) {
 				if (!arg.empty()) {
@@ -157,9 +176,21 @@ void Channel::setMode(char mode, bool enable, const Client& client, const std::s
 			for (; it != _members.end(); ++it) {
 				if (it->second->getNickname() == arg) {
 					if (enable)
+					{
 						_operators.insert(it->first);
+						LOG(DEBUG "Client " << it->second->getNickname() << " is now operator")
+						std::string msg = ":" + client.getPrefix() + " MODE " + _name + " +" + mode + " " + arg + "\r\n";
+						send(it->first, msg.c_str(), msg.length(), 0);
+						this->broadcast(msg, it->first);
+					}
 					else
+					{
 						_operators.erase(it->first);
+						LOG(DEBUG "Client " << it->second->getNickname() << " is no longer operator")
+						std::string msg = ":" + client.getPrefix() + " MODE " + _name + " -" + mode + " " + arg + "\r\n";
+						send(it->first, msg.c_str(), msg.length(), 0);
+						this->broadcast(msg, it->first);
+					}
 					LOG(INFO "Operator list = " << getOpList())
 					break;
 				}
@@ -171,6 +202,7 @@ void Channel::setMode(char mode, bool enable, const Client& client, const std::s
 			sendNumericReply(client.getFd(), 472, std::string(1, mode)); // Unknown mode
 			break;
 	}
+	this->broadcastModeChange(client, mode, enable, arg);
 }
 
 
@@ -184,8 +216,11 @@ void Channel::broadcastModeChange(const Client& setter, char mode, bool enable, 
 
 	msg += "\r\n";
 
-	std::map<int, Client*>::iterator it;
-	for (it = _members.begin(); it != _members.end(); ++it) {
-		send(it->first, msg.c_str(), msg.length(), 0);
+	if (mode != 'o')
+	{
+		std::map<int, Client*>::iterator it;
+		for (it = _members.begin(); it != _members.end(); ++it) {
+			send(it->first, msg.c_str(), msg.length(), 0);
+		}
 	}
 }
