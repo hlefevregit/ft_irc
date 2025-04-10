@@ -6,7 +6,7 @@
 /*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 10:49:14 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/08 14:06:24 by ldalmass         ###   ########.fr       */
+/*   Updated: 2025/04/10 12:33:45 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,15 +152,19 @@ void Server::botGetRandomAsciiArt(Client sender)
 void	Server::botListConnectedClients(Client sender)
 {
 	AUTO_LOG
+
+	// Get the list of connected clients
 	std::map<const int, Client>				clients = getClients();
 	std::map<const int, Client>::iterator	start = clients.begin();
 	std::map<const int, Client>::iterator	end = clients.end();
 	t_cell_data								data;
 
+	// Add headers to the grid
 	addCellData(data, "Nickname", CENTER);
 	addCellData(data, "Username", CENTER);
 	addCellData(data, "Socket", CENTER);
 
+	// Fill the grid with client data
 	while (start != end)
 	{
 		Client				client = start->second;
@@ -180,6 +184,7 @@ void	Server::botListConnectedClients(Client sender)
 		oss.clear();
 	}
 
+	// Send the grid to the client
 	unsigned short						y = clients.size() + 1;
 	std::vector<std::string>			grid = getGrid(data, 60, 3, y);
 	std::vector<std::string>::iterator	gridStart = grid.begin();
@@ -197,21 +202,24 @@ void	Server::botListConnectedClients(Client sender)
 		++gridStart;
 	}
 
-
 	return ;
 }
 
 void	Server::botListChannels(Client sender)
 {
 	AUTO_LOG
+
+	// Get the list of channels
 	std::map<std::string, Channel*>				channels = getChannels();
 	std::map<std::string, Channel*>::iterator	start = channels.begin();
 	std::map<std::string, Channel*>::iterator	end = channels.end();	
 	t_cell_data									data;
 
+	// Add headers to the grid
 	addCellData(data, "Channels", CENTER);
 	addCellData(data, "Topic", CENTER);
 
+	// Fill the grid with channel data
 	while (start != end)
 	{
 		Channel				*channel = start->second;
@@ -224,6 +232,7 @@ void	Server::botListChannels(Client sender)
 		++start;
 	}
 
+	// Send the grid to the client
 	unsigned short						y = channels.size() + 1;
 	std::vector<std::string>			grid = getGrid(data, 60, 2, y);
 	std::vector<std::string>::iterator	gridStart = grid.begin();
@@ -248,6 +257,7 @@ void	Server::botListChannelDetail(Client sender, std::string &channelName)
 {
 	AUTO_LOG
 
+	// Get the channel
 	Channel	*channel = getChannel(channelName);
 
 	// Check if the channel exists

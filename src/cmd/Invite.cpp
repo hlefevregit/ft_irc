@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Invite.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 11:56:56 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 12:41:34 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/10 17:55:55 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void Server::inviteCommand(Client& inviter, const std::string& params)
     channel->inviteClient(*invited);
 
     // Notify inviter
-    std::string numeric = "341 " + inviter.getNickname() + " " + invited->getNickname() + " " + chanName + "\r\n";
+    std::string numeric = inviter.getPrefix() + " 341 " + inviter.getNickname() + " " + invited->getNickname() + " " + chanName + "\r\n";
     send(inviter.getFd(), numeric.c_str(), numeric.length(), 0);
 
     // Notify invited client

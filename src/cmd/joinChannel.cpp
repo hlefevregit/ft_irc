@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   joinChannel.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hulefevr <hulefevr@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ldalmass <ldalmass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 10:52:09 by hulefevr          #+#    #+#             */
-/*   Updated: 2025/04/04 13:43:58 by hulefevr         ###   ########.fr       */
+/*   Updated: 2025/04/10 18:04:04 by ldalmass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void Server::joinCommand(Client &client, const std::string &params)
 				LOG(INFO "Client " << client.getNickname() << " cannot join invite-only channel " << chanName)
 				continue;
 			}
-			if (channel->hasMode('l') && channel->getMembers().size() >= channel->getUserLimit()) {
+			if (channel->hasMode('l') && channel->getMembers().size() >= channel->getUserLimit() && !channel->isInvited(client)) {
 				sendNumericReply(client.getFd(), 471, chanName);  // ERR_CHANNELISFULL
 				LOG(INFO "Client " << client.getNickname() << " cannot join full channel " << chanName)
 				continue;
