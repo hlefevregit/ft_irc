@@ -72,7 +72,7 @@ The server has been fully tested with HexChat, a popular IRC client.
 •	Only one poll() for all I/O
 •	Clean and modular codebase
 
-
+## SOURCES
 
 Everything you need to know about how we did this project is [here](https://www.figma.com/board/TEviHsREY663xd6BxfD1UQ/ft_irc?node-id=1-2&t=7nu0W9odqgLg8YLp-1) 
 
